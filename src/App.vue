@@ -1,32 +1,41 @@
 <template>
-  <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
+    <div id="app">
+        <v-loading :active.sync="isLoading" background-color="#f5f5f5" :opacity="opacity"></v-loading>
+        <router-view />
     </div>
-    <router-view/>
-  </div>
 </template>
-
+<script>
+export default {
+    data() {
+        return {
+            isLoading: true,
+            opacity: 1,
+            timer: null
+        }
+    },
+    created() {
+        this.$router.push('/')
+    },
+    mounted() {
+        this.$axios.post(this.$baseUrl.userInfo, {}).then(res => {
+            if (res.status == 200) {
+                this.userInfo = res.data
+                this.isLoading = false
+                window.sessionStorage.setItem('user', JSON.stringify(res.data))
+            } else {
+                alert('无权限访问')
+                setTimeout(() => {
+                    WeixinJSBridge.call('closeWindow')
+                }, 100)
+            }
+        })
+    }
+}
+</script>
 <style lang="scss">
 #app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
-
-#nav {
-  padding: 30px;
-
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-
-    &.router-link-exact-active {
-      color: #42b983;
-    }
-  }
+    background-color: #fff;
+    height: 100vh;
+    box-sizing: border-box;
 }
 </style>
