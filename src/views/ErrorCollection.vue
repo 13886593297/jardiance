@@ -1,11 +1,15 @@
 <template>
     <div class="collection">
         <p class="title">错题月考</p>
-        <div class="section" @click="getLastMQ" :class="{pass: status == '已测试'}">
-            <p class="month">Month {{month}}</p>
+        <div
+            @click="toErrorTrain"
+            v-if="failQuestionInfo.status"
+            :class="['section', {pass: failQuestionInfo.status > 1}]"
+        >
+            <p class="month">Month {{failQuestionInfo.month}}</p>
             <p class="section_name">
-                {{month}}月错题月考
-                <span>{{status}}</span>
+                {{failQuestionInfo.name}}
+                <span>{{failQuestionInfo.status > 1 ? '已测试' : '未测试'}}</span>
             </p>
         </div>
         <div class="allErrQ">
@@ -36,26 +40,21 @@
             </div>
             <button @click="goHome">返回首页</button>
         </div>
-        <div class="tip" v-if="showTip">
+        <div class="tip" v-show="showTip">
             <div>
                 <img src="../assets/img/error/2.jpg" alt />
                 <div>
                     <p>您已提交过答案</p>
-                    正确 {{correctNum}}道
-                    <i>错误 {{errorNum}}道</i>
+                    正确 {{testInfo.successNum}}道
+                    <i>错误 {{testInfo.errorNum}}道</i>
                     <br />
                     <span>
                         获得
-                        <strong>{{score}}</strong> 积分
+                        <strong>{{testInfo.successScore}}</strong> 积分
                     </span>
                     <br />加油！
                 </div>
-                <img
-                    class="colse"
-                    src="../assets/img/details/close.png"
-                    @click="showTip = false"
-                    alt
-                />
+                <img class="colse" src="../assets/img/details/close.png" @click="showTip = false" alt />
             </div>
         </div>
     </div>
@@ -67,89 +66,86 @@ export default {
         return {
             month: new Date().getMonth() == 0 ? 12 : new Date().getMonth(),
             section_name: '超声医学应用习题',
-            status: '未测试',
+            failQuestionInfo: {},
+            testInfo: {},
             allErrQ: [],
             noQues: false,
-            showTip: false,
-            correctNum: 0,
-            errorNum: 0,
-            score: 0
+            showTip: false
         }
     },
     created() {
-        let testTime = new Date(this.$handler.getStorage('testTime')).getMonth()
-        let nowTime = new Date().getMonth()
-        if (testTime == nowTime) {
-            this.status = '已测试'
-        }
-
-        this.$axios.post(this.$baseUrl.getTestTime).then(res => {
-            this.correctNum = res.data.successNum
-            this.errorNum = res.data.errorNum
-            this.score = res.data.successScore
-        })
-
         this.$axios
-            .get(this.$baseUrl.article, {
-                params: {
-                    pageNow: 1,
-                    pageSize: 10
-                }
-            })
-            .then(res => {
-                if (res.data.length == 0) {
-                    this.noQues = true
-                } else {
-                    res.data.forEach(item => {
-                        if (
-                            item.trainStatus == 2 &&
-                            item.arttcleTime.status == 200
-                        ) {
-                            item._status = 3
-                        } else if (
-                            item.trainStatus == 2 &&
-                            item.arttcleTime.status == 201
-                        ) {
-                            item._status = 2
-                        } else if (item.trainStatus == 1) {
-                            item._status = 1
-                        } else if (item.trainStatus == 0) {
-                            item._status = 0
-                        }
-                    })
-                    res.data.sort((a, b) => {
-                        return b._status - a._status
-                    })
-                    setInterval(() => {
-                        this.allErrQ = []
-                        res.data.forEach(item => {
-                            if (item.arttcleTime.status != 200) {
-                                let expireTime = new Date(
-                                    item.arttcleTime.time
-                                ).getTime()
-                                let nowTime = new Date().getTime()
-                                let diff = (expireTime - nowTime) / 1000
-                                if (diff > 0) {
-                                    let h = Math.floor(diff / 3600)
-                                    let m = Math.floor((diff / 60) % 60)
-                                    let s = Math.floor(diff % 60)
-                                    item.arttcleTime.formatTime = `还剩 ${h}h ${m}min ${s}s`
-                                } else {
-                                    item.arttcleTime.status = 200
-                                }
-                            }
-                            this.allErrQ.push(item)
-                        })
-                    }, 1000)
-                }
-            })
+            .all([
+                this.$axios.get(this.$baseUrl.getLastMonthFailQuestionStatus),
+                this.$axios.post(this.$baseUrl.getTestTime),
+                this.$axios.get(this.$baseUrl.article, {
+                    params: {
+                        pageNow: 1,
+                        pageSize: 10
+                    }
+                })
+            ])
+            .then(
+                this.$axios.spread((qStatus, testInfo, article) => {
+                    console.log(qStatus)
+                    this.failQuestionInfo = qStatus.data
+                    this.testInfo = testInfo.data
+                    if (article.data.length == 0) {
+                        this.noQues = true
+                    } else {
+                        this.formatArticle(article)
+                    }
+                })
+            )
     },
     methods: {
-        getLastMQ() {
-            if (this.status == '未测试') {
-                if (!this.noQues) {
-                    this.$router.push('errorTrain')
+        formatArticle(article) {
+            article.data.forEach(item => {
+                if (item.trainStatus == 2 && item.arttcleTime.status == 200) {
+                    item._status = 3
+                } else if (
+                    item.trainStatus == 2 &&
+                    item.arttcleTime.status == 201
+                ) {
+                    item._status = 2
+                } else if (item.trainStatus == 1) {
+                    item._status = 1
+                } else if (item.trainStatus == 0) {
+                    item._status = 0
                 }
+            })
+            article.data.sort((a, b) => {
+                return b._status - a._status
+            })
+            setInterval(() => {
+                this.allErrQ = []
+                article.data.forEach(item => {
+                    if (item.arttcleTime.status != 200) {
+                        let expireTime = new Date(item.arttcleTime.time).getTime()
+                        let nowTime = new Date().getTime()
+                        let diff = (expireTime - nowTime) / 1000
+                        if (diff > 0) {
+                            let h = Math.floor(diff / 3600)
+                            let m = Math.floor((diff / 60) % 60)
+                            let s = Math.floor(diff % 60)
+                            item.arttcleTime.formatTime = `还剩 ${h}h ${m}min ${s}s`
+                        } else {
+                            item.arttcleTime.status = 200
+                        }
+                    }
+                    this.allErrQ.push(item)
+                })
+            }, 1000)
+        },
+        toErrorTrain() {
+            if (this.failQuestionInfo.status == 1) {
+                this.$router.push({
+                    name: 'errorTrain',
+                    query: {
+                        year: this.failQuestionInfo.year,
+                        month: this.failQuestionInfo.month
+                    }
+                })
             } else {
                 this.showTip = true
             }

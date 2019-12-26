@@ -1,6 +1,7 @@
 <template>
     <div class="trainIndex">
         <search-header name="home" @getChildData="getChildData"></search-header>
+        <tip v-show="showTip" title="404！" content="很抱歉，没有您搜索的内容"></tip>
         <div class="content" v-if="!search">
             <ul>
                 <router-link
@@ -36,6 +37,7 @@
 <script>
 import SearchHeader from '../components/SearchHeader'
 import SectionComponent from '../components/SectionComponent'
+import Tip from '../components/Tip'
 export default {
     data() {
         return {
@@ -44,12 +46,14 @@ export default {
             sections: [],
             idArr: [],
             ani: false,
-            search: false
+            search: false,
+            showTip: false
         }
     },
     components: {
         SearchHeader,
-        SectionComponent
+        SectionComponent,
+        Tip
     },
     created() {
         this.$axios
@@ -66,10 +70,14 @@ export default {
             this.sections = []
             this.idArr = []
             this.ani = true
+            if (val.data.length == 0) {
+                this.showTip = true
+                setTimeout(() => {
+                    this.showTip = false
+                }, 2000)
+            }
+
             setTimeout(() => {
-                if (val.data.length == 0) {
-                    alert('没有搜索到您输入的内容，请重新搜索！')
-                }
                 this.sections = val.data
                 this.$refs.container.style.gridTemplateRows = `repeat(${this.sections.length}, 42vw)`
                 this.sections.forEach(item => {

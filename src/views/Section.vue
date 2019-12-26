@@ -1,6 +1,7 @@
 <template>
     <div class="Section">
         <search-header name="back" :id="id" @getChildData="getChildData"></search-header>
+        <tip v-show="showTip" title="404！" content="很抱歉，没有您搜索的内容"></tip>
         <div class="container" ref="container">
             <section-component
                 v-for="(section, key) in sections"
@@ -16,18 +17,21 @@
 <script>
 import SearchHeader from '../components/SearchHeader'
 import SectionComponent from '../components/SectionComponent'
+import Tip from '../components/Tip'
 export default {
     data() {
         return {
             id: this.$route.query.id,
             sections: [],
             idArr: [],
-            ani: false
+            ani: false,
+            showTip: false
         }
     },
     components: {
         SearchHeader,
-        SectionComponent
+        SectionComponent,
+        Tip
     },
     created() {
         this.$axios
@@ -51,10 +55,13 @@ export default {
             this.sections = []
             this.idArr = []
             this.ani = true
+            if (val.data.length == 0) {
+                this.showTip = true
+                setTimeout(() => {
+                    this.showTip = false
+                }, 2000)
+            }
             setTimeout(() => {
-                if (val.data.length == 0) {
-                    alert('没有搜索到您输入的内容，请重新搜索！')
-                }
                 this.sections = val.data
                 this.$refs.container.style.gridTemplateRows = `repeat(${this.sections.length}, 42vw)`
                 this.sections.forEach(item => {

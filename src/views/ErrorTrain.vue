@@ -1,17 +1,13 @@
 <template>
     <div class="error_train">
         <div class="header">
-            <div class="left">
-                <!-- <div class="title">{{month}}月错题月考</div> -->
-                <!-- <p class="section">{{name}}</p> -->
-            </div>
             <p class="right">
                 <span class="curQNo">{{curQNo + 1}}</span>/
                 <span class="totalQ">{{totalQ.length}}</span>
             </p>
         </div>
         <div class="process-bar" ref="process_bar">
-            <div ref="process" v-for="i in totalQ.length" :key="i"></div>
+            <div v-for="i in totalQ.length" :key="i"></div>
         </div>
         <div class="question" ref="question">
             <div class="qContent">
@@ -51,8 +47,6 @@
 export default {
     data() {
         return {
-            month: new Date().getMonth() == 0 ? 12 : new Date().getMonth(),
-            name: '',
             curQNo: 0,
             totalQ: [],
             topic: '', // 题目
@@ -64,19 +58,32 @@ export default {
             correctNum: 0 // 正确题数
         }
     },
-    created() {
-        this.$axios.get(this.$baseUrl.getLastMQ).then(res => {
-            this.totalQ = res.data
-            this.$refs.process_bar.style.gridTemplateColumns = `repeat(${this.totalQ.length}, 1fr)`
-            this.init()
-            console.log(res)
-        })
+    mounted() {
+        this.$axios
+            .post(this.$baseUrl.getLastMonthFailQuestionList, {
+                year: this.$route.query.year,
+                month: this.$route.query.month
+            })
+            .then(res => {
+                this.totalQ = res.data.data
+                this.curQNo = this.totalQ.findIndex(
+                    item => item.reply == 'null'
+                )
+                this.$refs.process_bar.style.gridTemplateColumns = `repeat(${this.totalQ.length}, 1fr)`
+                this.$nextTick(() => {
+                    this.totalQ.forEach((item, i) => {
+                        if (item.reply != 'null') {
+                            this.$refs.process_bar.children[i].style.backgroundColor = item.is_correct ? '#009b96' : '#fd7572'
+                        }
+                    })
+                })
+                this.init()
+            })
     },
     methods: {
         init() {
             this.topic = this.totalQ[this.curQNo].question
             this.qCorrect = this.totalQ[this.curQNo].anwser_correct.trim()
-            this.name = this.totalQ[this.curQNo].name
             console.log('正确答案为', this.qCorrect)
             // 重置选项和玩家选择的答案
             this.options = []
@@ -116,24 +123,23 @@ export default {
             let isCorrect = reply == this.qCorrect ? 1 : 0
 
             this.$axios.post(this.$baseUrl.submitErrorQuestion, {
-                qid: this.totalQ[this.curQNo].id,
                 reply,
                 isCorrect,
-                isEnd: this.curQNo == this.totalQ.length - 1,
-                questionNum: this.totalQ.length
+                questionNum: this.totalQ.length,
+                qid: this.totalQ[this.curQNo].id,
+                isEnd: this.curQNo == this.totalQ.length - 1
+            }).then(res => {
+                console.log(res)
+                this.correctNum = res.data.successScore
             })
 
             if (isCorrect) {
                 this.$refs.li[this.answer].classList = 'cur'
-                this.$refs.process_bar.children[
-                    this.curQNo
-                ].style.backgroundColor = '#009b96'
-                this.correctNum += 1
+                this.$refs.process_bar.children[this.curQNo].style.backgroundColor = '#009b96'
+                
             } else {
                 this.$refs.li[this.answer].classList = 'err'
-                this.$refs.process_bar.children[
-                    this.curQNo
-                ].style.backgroundColor = '#fd7572'
+                this.$refs.process_bar.children[this.curQNo].style.backgroundColor = '#fd7572'
             }
         },
         back() {
@@ -150,20 +156,8 @@ export default {
     height: 100vh;
     .header {
         display: grid;
-        grid-template-columns: 60% 40%;
-        align-items: end;
-        .left {
-            .title {
-                font-size: 6vw;
-            }
-            .section {
-                margin-top: 4vw;
-                font-size: 4vw;
-                color: #565656;
-            }
-        }
+        justify-items: center;
         .right {
-            justify-self: end;
             .curQNo {
                 font-size: 17.5vw;
                 color: #009b96;

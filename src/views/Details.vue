@@ -1,5 +1,6 @@
 <template>
     <div class="details">
+        <tip v-show="showTip" title="404！" content="很抱歉，这已经是最后一篇了。"></tip>
         <div class="header">
             <div class="header-arrow">
                 <img src="../assets/img/details/back.png" @click="back" alt />
@@ -27,8 +28,9 @@
 
 <script>
 import pdf from 'vue-pdf'
+import Tip from '../components/Tip'
 export default {
-    components: { pdf },
+    components: { pdf, Tip },
     data() {
         return {
             id: this.$route.query.id,
@@ -41,52 +43,58 @@ export default {
             currentPage: 0,
             pageCount: 0,
             uuid: '',
-            index: 0
+            index: 0,
+            showTip: false
         }
     },
     created() {
         // this.pdf = pdf.createLoadingTask(this.pdf)
         this.index = this.idArr.indexOf(this.id)
-        this.init()
-    },
-    mounted() {
-        this.$axios
-            .post(this.$baseUrl.startReadArticle, {
-                startTime: new Date(),
-                articleId: this.id
+        this.$axios.all([this.startReadArticle(), this.getNextArticle()]).then(
+            this.$axios.spread((read, next) => {
+                this.uuid = read.data.uuid
+                this.id = next.data[0].id
+                this.name = next.data[0].name
+                this.pdf = next.data[0].pdf
             })
-            .then(res => {
-                this.uuid = res.data.uuid
-            })
+        )
     },
     beforeDestroy() {
-        this.$axios
-            .post(this.$baseUrl.endReadArticle, {
-                endTime: new Date(),
-                uuid: this.uuid
-            })
+        this.$axios.post(this.$baseUrl.endReadArticle, {
+            endTime: new Date(),
+            uuid: this.uuid
+        })
     },
     methods: {
         back() {
             this.$router.back()
         },
-        init() {
-            // if (this.idArr[this.index]) {
-                this.$axios
-                    .post(this.$baseUrl.getNextArticle, {
-                        articleId: this.idArr[this.index] || this.id
-                    })
-                    .then(res => {
-                        console.log(res)
-                        this.id = res.data[0].id
-                        this.name = res.data[0].name
-                        this.pdf = res.data[0].pdf
-                    })
-            // }
+        startReadArticle() {
+            return this.$axios.post(this.$baseUrl.startReadArticle, {
+                startTime: new Date(),
+                articleId: this.id
+            })
+        },
+        getNextArticle() {
+            return this.$axios.post(this.$baseUrl.getNextArticle, {
+                articleId: this.idArr[this.index] || this.id
+            })
         },
         next() {
             this.index++
-            this.init()
+            if (this.index >= this.idArr.length) {
+                this.showTip = true
+                setTimeout(() => {
+                    this.showTip = false
+                }, 2000)
+                return
+            } else {
+                this.getNextArticle().then(res => {
+                    this.id = res.data[0].id
+                    this.name = res.data[0].name
+                    this.pdf = res.data[0].pdf
+                })
+            }
         },
         changePdfPage(val) {
             if (val === 0 && this.currentPage > 1) {

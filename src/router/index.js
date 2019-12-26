@@ -104,6 +104,10 @@ const routes = [
         meta: {
             title: '医讯速递'
         }
+    },
+    {
+        path: '*',
+        redirect: '/'
     }
 ]
 

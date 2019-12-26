@@ -63,7 +63,10 @@
 </template>
 
 <script>
+import store from '../store'
+import { mapMutations } from 'vuex'
 export default {
+    store,
     name: 'index',
     data() {
         return {
@@ -71,11 +74,25 @@ export default {
         }
     },
     created() {
-        this.$axios.post(this.$baseUrl.userInfo, {}).then(res => {
-            this.userInfo = res.data
-            window.sessionStorage.setItem('user', JSON.stringify(res.data))
-            let processWidth = this.userInfo.totalTrain / this.userInfo.totalQuestion
-            this.$refs.process.style.width = Math.floor(processWidth * 100) + '%'
+        this.$axios.get(this.$baseUrl.userInfo).then(res => {
+            console.log(res)
+            store.commit('hide')
+            // if (typeof res.data == 'string') {
+            //     window.location.href = res.data
+            // } else {
+            //     if (res.status == 200) {
+            //         this.userInfo = res.data
+            //         store.commit('hide')
+            //         window.sessionStorage.setItem('user', JSON.stringify(res.data))
+            //         let processWidth = this.userInfo.totalTrain / this.userInfo.totalQuestion
+            //         this.$refs.process.style.width = Math.floor(processWidth * 100) + '%'
+            //     } else {
+            //         alert('无权限访问')
+            //         setTimeout(() => {
+            //             WeixinJSBridge.call('closeWindow')
+            //         }, 100)
+            //     }
+            // }
         })
     },
     methods: {
@@ -90,7 +107,8 @@ export default {
         },
         toRanking() {
             this.$router.push('rank')
-        }
+        },
+        ...mapMutations(['hide'])
     }
 }
 </script>

@@ -19,14 +19,11 @@
                 >
                     <div class="top">
                         <div>
-                            <p class="time">11/08</p>
+                            <p class="time">{{item.create_time | timeformat}}</p>
                             <p class="name">{{item.name}}</p>
                         </div>
                         <div>
-                            <img
-                                :src="require(`../assets/img/medical/${item.trainStatus}.png`)"
-                                alt
-                            />
+                            <img :src="require(`../assets/img/medical/${item.trainStatus}.png`)" alt />
                             <p class="status" v-if="item.trainStatus == 1">PASS</p>
                             <p class="status" v-if="item.trainStatus == 2">FAIL</p>
                         </div>
@@ -51,6 +48,12 @@ export default {
     created() {
         this.init()
     },
+    filters: {
+        timeformat(time) {
+            let date = time.split('T')[0].split('-')
+            return date[1] + '/' + date[2]
+        }
+    },
     methods: {
         init() {
             this.$axios
@@ -70,8 +73,8 @@ export default {
                     }
                 })
                 .then(res => {
-                    this.list = res.data.reverse()
                     console.log(res)
+                    this.list = res.data.reverse()
                 })
         },
         toDetails(id, name, status) {

@@ -8,10 +8,13 @@ import * as Handler from './assets/js/handler'
 import './assets/css/base.scss'
 import Loading from 'vue-loading-overlay'
 import 'vue-loading-overlay/dist/vue-loading.css'
+import store from './store'
 
-// new VConsole()
+new VConsole()
 Vue.config.productionTip = false
-Axios.defaults.baseURL = 'http://192.168.1.101:8888'
+if (process.env.NODE_ENV == "development") {
+    Axios.defaults.baseURL = 'http://192.168.1.101:8080'
+}
 
 const defaultTitle = '非常静距离'
 router.beforeEach((to, from, next) => {
@@ -40,6 +43,16 @@ function setSign(signUrl) {
         })
     }, 3000)
 }
+
+// const myInterrceptor = Axios.interceptors.request.use(config => {
+//     store.commit('show')
+//     return config
+// })
+
+// Axios.interceptors.response.use(config => {
+//     store.commit('hide')
+//     return config
+// })
 
 // 挂载全局对象
 Vue.prototype.$axios = Axios

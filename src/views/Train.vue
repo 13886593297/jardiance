@@ -1,6 +1,7 @@
 <template>
     <div class="main">
         <train-header :id="id" :name="name" :sectionEn="true" :curQNo="curQNo" :totalQ="totalQ"></train-header>
+        <tip v-show="showTip" title="OMG！" content="哎呀，您还没有选择答案哦！"></tip>
         <div class="process-bar" ref="process_bar">
             <div ref="process" v-for="i in totalQ.length" :key="i"></div>
         </div>
@@ -47,8 +48,9 @@
 </template>
 <script>
 import TrainHeader from '../components/TrainHeader'
+import Tip from '../components/Tip'
 export default {
-    components: { TrainHeader },
+    components: { TrainHeader, Tip },
     data() {
         return {
             id: this.$route.params.id,
@@ -64,7 +66,8 @@ export default {
             correctNum: 0, // 正确题数
             score: 0, // 获得积分
             errorNum: 0, // 错误题数
-            errorQuestion: []
+            errorQuestion: [],
+            showTip: false
         }
     },
     created() {
@@ -104,7 +107,13 @@ export default {
             }
         },
         submit() {
-            if (this.answer === '') return
+            if (this.answer === '') {
+                this.showTip = true
+                setTimeout(() => {
+                    this.showTip = false
+                }, 2000)
+                return
+            }
             this.$refs.question.classList.add('disabled')
 
             setTimeout(() => {
@@ -135,7 +144,7 @@ export default {
                 .then(res => {
                     if (typeof res.data == 'object') {
                         this.correctNum = res.data.correctNum
-                        this.score = this.correctScore
+                        this.score = res.data.correctScore
                         this.errorQuestion = res.data.questionInfo || []
                     }
                 })

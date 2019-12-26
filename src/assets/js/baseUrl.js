@@ -6,13 +6,14 @@ export default {
     article: '/api/train/article',
     submitQuestion: '/api/train/submitQuestion',
     getSubmitTime: '/api/train/getSubmitTime',
-    getLastMQ: '/api/train/getLastMQ',
     getArticleErrorQuestion: '/api/train/getArticleErrorQuestion',
     submitErrorQuestion: '/api/train/submitErrorQuestion',
     getTestTime: '/api/train/getTestTime',
     getArticleCategory: '/api/train/getArticleCategory',
     startReadArticle: '/api/train/startReadArticle',
     endReadArticle: '/api/train/endReadArticle',
-    getNextArticle: '/api/train/getNextArticle'
+    getNextArticle: '/api/train/getNextArticle',
+    getLastMonthFailQuestionStatus: '/api/train/getLastMonthFailQuestionStatus',
+    getLastMonthFailQuestionList: 'api/train/getLastMonthFailQuestionList'
   }
   

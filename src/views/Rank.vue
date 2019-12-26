@@ -30,12 +30,12 @@
             </ul>
             <ul>
                 <li v-for="(item, key) in rank" :key="key">
-                    <img :src="item.avatar || avatar" alt />
+                    <img :src="item.avatar || default_avatar" alt />
                     <div>
                         <p class="name">
                             {{item.name}}
                             <br />
-                            <span>积分{{item.score}}</span>
+                            <span>积分{{item.score || 0}}</span>
                         </p>
                         <p class="rank">TOP{{item.serialNo}}</p>
                     </div>
@@ -50,11 +50,12 @@
 export default {
     data() {
         return {
+            default_avatar: require('../assets/img/rank/default_avatar.png'),
             avatar: this.$handler.getStorage('avatar'),
             user_rank: this.$handler.getStorage('personalRank'),
             user_score: this.$handler.getStorage('totalScore'),
             group: ['SR', 'DM', 'RSD', 'RMM'],
-            apiArr: ['personalRank', 'DMRank', 'RSDRank', 'DMMRank'],
+            apiArr: ['personalRank', 'RMMAndDMRank?teamRank=DM', 'RSDRank', 'RMMAndDMRank?teamRank=RMM'],
             active: 0,
             rank: []
         }
@@ -72,7 +73,6 @@ export default {
                 .get('/api/rank/' + this.apiArr[this.active])
                 .then(res => {
                     this.rank = res.data
-                    console.log(res)
                 })
         },
         goHome() {
@@ -161,7 +161,7 @@ export default {
                     align-items: center;
                     > div {
                         display: grid;
-                        grid-template-columns: 80% 20%;
+                        grid-template-columns: 70% 30%;
                         align-items: center;
                         justify-items: center;
                         border-bottom: 1px solid #eaeaea;
@@ -176,6 +176,7 @@ export default {
                         .rank {
                             color: #008d7c;
                             font-weight: bold;
+                            padding: 6.5vw 0;
                         }
                     }
                 }
