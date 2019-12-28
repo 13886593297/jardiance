@@ -27,7 +27,11 @@ export default {
         toDetails(id, status) {
             this.$router.push({
                 name: 'details',
-                query: { id, status, idArr: this.idArr }
+                query: {
+                    id,
+                    status, // 0 continue 1 pass 2 fail
+                    idArr: this.idArr
+                }
             })
         }
     }

@@ -61,7 +61,7 @@ export default {
             options: [], // 题目选项
             answer: '', // 玩家选择的答案
             qCorrect: '', // 正确答案
-            subText: '下一题',
+            subText: '',
             isEnd: false,
             correctNum: 0, // 正确题数
             score: 0, // 获得积分
@@ -81,6 +81,7 @@ export default {
                     this.totalQ = res.data
                     this.init()
                     this.$refs.process_bar.style.gridTemplateColumns = `repeat(${this.totalQ.length}, 1fr)`
+                    this.subText = this.totalQ.length > 1 ? '下一题' : '提交'
                 }
             })
     },

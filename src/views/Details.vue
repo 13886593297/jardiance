@@ -102,29 +102,31 @@ export default {
             }
             if (val === 1 && this.currentPage < this.pageCount) {
                 this.currentPage++
-                // if (this.currentPage == this.pageCount) {
-                //     this.$router.replace({
-                //         name: 'completeStudy',
-                //         query: {
-                //             id: this.id,
-                //             name: this.name,
-                //             status: this.status
-                //         }
-                //     })
-                // }
-            }
-            if (this.currentPage == 2) {
-                this.$router.replace({
-                    name: 'completeStudy',
-                    query: {
-                        id: this.id,
-                        name: this.name,
-                        status: this.status
+                if (process.env.NODE_ENV == 'development') {
+                    if (this.currentPage == 2) {
+                        this.$router.replace({
+                            name: 'completeStudy',
+                            query: {
+                                id: this.id,
+                                name: this.name,
+                                status: this.status
+                            }
+                        })
                     }
-                })
+                } else {
+                    if (this.currentPage == this.pageCount) {
+                        this.$router.replace({
+                            name: 'completeStudy',
+                            query: {
+                                id: this.id,
+                                name: this.name,
+                                status: this.status
+                            }
+                        })
+                    }
+                }
             }
         },
-
         // pdf加载时
         loadPdfHandler(e) {
             this.currentPage = 1 // 加载的时候先加载第一页

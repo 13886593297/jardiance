@@ -8,7 +8,6 @@ import * as Handler from './assets/js/handler'
 import './assets/css/base.scss'
 import Loading from 'vue-loading-overlay'
 import 'vue-loading-overlay/dist/vue-loading.css'
-import store from './store'
 
 new VConsole()
 Vue.config.productionTip = false
@@ -43,16 +42,6 @@ function setSign(signUrl) {
         })
     }, 3000)
 }
-
-// const myInterrceptor = Axios.interceptors.request.use(config => {
-//     store.commit('show')
-//     return config
-// })
-
-// Axios.interceptors.response.use(config => {
-//     store.commit('hide')
-//     return config
-// })
 
 // 挂载全局对象
 Vue.prototype.$axios = Axios

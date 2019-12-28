@@ -16,10 +16,10 @@
                     <p class="nameEn" v-if="data.id == 2">Competition Section</p>
                 </router-link>
             </ul>
-            <div class="btn">
+            <!-- <div class="btn">
                 <button>名字还没定</button>
                 <button>名字还没定</button>
-            </div>
+            </div> -->
         </div>
         <div class="container" ref="container" v-else>
             <section-component

@@ -74,25 +74,20 @@ export default {
         }
     },
     created() {
+        // userCode 2 正常 1 没有这个用户
         this.$axios.get(this.$baseUrl.userInfo).then(res => {
-            console.log(res)
-            store.commit('hide')
-            // if (typeof res.data == 'string') {
-            //     window.location.href = res.data
-            // } else {
-            //     if (res.status == 200) {
-            //         this.userInfo = res.data
-            //         store.commit('hide')
-            //         window.sessionStorage.setItem('user', JSON.stringify(res.data))
-            //         let processWidth = this.userInfo.totalTrain / this.userInfo.totalQuestion
-            //         this.$refs.process.style.width = Math.floor(processWidth * 100) + '%'
-            //     } else {
-            //         alert('无权限访问')
-            //         setTimeout(() => {
-            //             WeixinJSBridge.call('closeWindow')
-            //         }, 100)
-            //     }
-            // }
+            if (res.data.userCode == 2) {
+                this.userInfo = res.data.reUserInfo
+                store.commit('hide')
+                window.sessionStorage.setItem('user', JSON.stringify(res.data.reUserInfo))
+                let processWidth = this.userInfo.totalTrain / this.userInfo.totalQuestion
+                this.$refs.process.style.width = Math.floor(processWidth * 100) + '%'
+            } else {
+                alert('无权限访问')
+                setTimeout(() => {
+                    WeixinJSBridge.call('closeWindow')
+                }, 100)
+            }
         })
     },
     methods: {
@@ -197,7 +192,7 @@ export default {
 }
 
 .small {
-    font-size: 2.1vw;
+    font-size: 3vw;
 }
 
 .big {
