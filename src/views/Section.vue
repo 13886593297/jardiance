@@ -8,7 +8,6 @@
                 :key="key"
                 :index="key"
                 :section="section"
-                :idArr="idArr"
                 :ani="ani"
             ></section-component>
         </div>
@@ -23,7 +22,6 @@ export default {
         return {
             id: this.$route.query.id,
             sections: [],
-            idArr: [],
             ani: false,
             showTip: false
         }
@@ -35,7 +33,7 @@ export default {
     },
     created() {
         this.$axios
-            .get(this.$baseUrl.article, {
+            .get(this.$baseUrl.getArticleList, {
                 params: {
                     categoryId: this.id,
                     pageNow: 1,
@@ -43,17 +41,14 @@ export default {
                 }
             })
             .then(res => {
-                this.sections = res.data.reverse()
+                console.log(res)
+                this.sections = res.data
                 this.$refs.container.style.gridTemplateRows = `repeat(${this.sections.length}, 42vw)`
-                this.sections.forEach(item => {
-                    this.idArr.push(item.id)
-                })
             })
     },
     methods: {
         getChildData(val) {
             this.sections = []
-            this.idArr = []
             this.ani = true
             if (val.data.length == 0) {
                 this.showTip = true
@@ -64,9 +59,6 @@ export default {
             setTimeout(() => {
                 this.sections = val.data
                 this.$refs.container.style.gridTemplateRows = `repeat(${this.sections.length}, 42vw)`
-                this.sections.forEach(item => {
-                    this.idArr.push(item.id)
-                })
             }, 500)
         }
     }

@@ -38,13 +38,16 @@
                     </div>
                 </div>
             </div>
-            <button class="submit" @click="submit">{{subText}}</button>
+            <button class="submit" @click="submit" v-if="show">{{subText}}</button>
         </div>
     </div>
 </template>
 
 <script>
+import store from '../store'
+import { mapMutations } from 'vuex'
 export default {
+    store,
     data() {
         return {
             curQNo: 0,
@@ -53,12 +56,14 @@ export default {
             options: [], // 题目选项
             answer: '', // 玩家选择的答案
             qCorrect: '', // 正确答案
-            subText: '下一题',
+            subText: '',
             isEnd: false,
+            show: true,
             correctNum: 0 // 正确题数
         }
     },
     mounted() {
+        this.setInterceptor(false)
         this.$axios
             .post(this.$baseUrl.getLastMonthFailQuestionList, {
                 year: this.$route.query.year,
@@ -66,6 +71,7 @@ export default {
             })
             .then(res => {
                 this.totalQ = res.data.data
+                this.subText = this.totalQ.length > 1 ? '下一题' : '提交'
                 this.curQNo = this.totalQ.findIndex(
                     item => item.reply == 'null'
                 )
@@ -80,7 +86,11 @@ export default {
                 this.init()
             })
     },
+    beforeDestroy() {
+        this.setInterceptor(true)
+    },
     methods: {
+        ...mapMutations(['setInterceptor']),
         init() {
             this.topic = this.totalQ[this.curQNo].question
             this.qCorrect = this.totalQ[this.curQNo].anwser_correct.trim()
@@ -104,6 +114,9 @@ export default {
         },
         submit() {
             if (this.answer === '') return
+            if (this.subText == '提交') {
+                this.show = false
+            }
             this.$refs.question.classList.add('disabled')
             setTimeout(() => {
                 if (this.curQNo < this.totalQ.length - 1) {
@@ -182,6 +195,7 @@ export default {
         .qContent {
             height: 92vw;
             overflow-x: scroll;
+            margin-bottom: 4vw;
             .topic {
                 display: grid;
                 grid-template-columns: 3vw auto;

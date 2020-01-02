@@ -2,10 +2,11 @@
     <div class="header">
         <div class="left">
             <div class="top">
-                <p>第{{id}}章</p>
+                <!-- <p>第{{id}}章</p> -->
+                <p>第一章</p>
                 <p v-if="sectionEn">
-                    Chapter
-                    <span>{{sectionArr[id - 1]}}</span>
+                    Chapter One
+                    <!-- <span>{{sectionArr[id - 1]}}</span> -->
                 </p>
             </div>
             <p class="section">{{name}}</p>

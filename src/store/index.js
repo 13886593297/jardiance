@@ -4,8 +4,8 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
     state: {
-        loading: true,
-        opacity: 1
+        loading: false,
+        interceptor: true
     },
     mutations: {
         show(state) {
@@ -14,8 +14,8 @@ export default new Vuex.Store({
         hide(state) {
             state.loading = false
         },
-        setOpacity(state, val) {
-            state.opacity = val
+        setInterceptor(state, val) {
+            state.interceptor = val
         }
     }
 })

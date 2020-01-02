@@ -10,15 +10,15 @@
             </div>
             <div class="userInfo-bottom">
                 <div>
-                    <p class="big">{{ userInfo.totalScore }}</p>
+                    <p class="big">{{ userInfo.totalScore || 0 }}</p>
                     <p class="small">个人积分</p>
                 </div>
                 <div>
-                    <p class="big">{{ userInfo.personalRank }}</p>
+                    <p class="big">{{ userInfo.personalRank || 0 }}</p>
                     <p class="small">排名</p>
                 </div>
                 <div>
-                    <p class="big">{{ userInfo.signTotalScore }}</p>
+                    <p class="big">{{ userInfo.signTotalScore || 0 }}</p>
                     <p class="small">已打卡</p>
                 </div>
             </div>
@@ -63,10 +63,7 @@
 </template>
 
 <script>
-import store from '../store'
-import { mapMutations } from 'vuex'
 export default {
-    store,
     name: 'index',
     data() {
         return {
@@ -76,17 +73,24 @@ export default {
     created() {
         // userCode 2 正常 1 没有这个用户
         this.$axios.get(this.$baseUrl.userInfo).then(res => {
-            if (res.data.userCode == 2) {
+            // if (res.data.userCode == 2) {
+            //     this.userInfo = res.data.reUserInfo
+            //     window.sessionStorage.setItem('user', JSON.stringify(res.data.reUserInfo))
+            //     let processWidth = this.userInfo.totalTrain / this.userInfo.totalQuestion
+            //     this.$refs.process.style.width = Math.floor(processWidth * 100) + '%'
+            // } else {
+            //     alert('无权限访问')
+            //     setTimeout(() => {
+            //         WeixinJSBridge.call('closeWindow')
+            //     }, 100)
+            // }
+            if (typeof res.data == 'string') {
+                window.location.href = res.data
+            } else {
                 this.userInfo = res.data.reUserInfo
-                store.commit('hide')
                 window.sessionStorage.setItem('user', JSON.stringify(res.data.reUserInfo))
                 let processWidth = this.userInfo.totalTrain / this.userInfo.totalQuestion
                 this.$refs.process.style.width = Math.floor(processWidth * 100) + '%'
-            } else {
-                alert('无权限访问')
-                setTimeout(() => {
-                    WeixinJSBridge.call('closeWindow')
-                }, 100)
             }
         })
     },
@@ -102,8 +106,7 @@ export default {
         },
         toRanking() {
             this.$router.push('rank')
-        },
-        ...mapMutations(['hide'])
+        }
     }
 }
 </script>
@@ -121,6 +124,7 @@ export default {
             height: 20vw;
             img {
                 width: 20vw;
+                height: 20vw;
                 border-radius: 50%;
             }
             div {

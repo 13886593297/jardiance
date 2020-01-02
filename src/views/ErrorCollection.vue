@@ -19,7 +19,7 @@
                     v-for="(item, key) in allErrQ"
                     :key="key"
                     :class="{fall: item.trainStatus == 2 && item.arttcleTime.status == 200, continue: item.trainStatus == 2 && item.arttcleTime.status == 201}"
-                    @click="getArticleErrorQuestion(item.name, item.id, item.trainStatus)"
+                    @click="getArticleErrorQuestion(item.name, item.id, item.trainStatus, item.category_id)"
                 >
                     <div class="circle"></div>
                     <div class="time">{{item.submit_time | timeformat}}</div>
@@ -78,7 +78,7 @@ export default {
             .all([
                 this.$axios.get(this.$baseUrl.getLastMonthFailQuestionStatus),
                 this.$axios.post(this.$baseUrl.getTestTime),
-                this.$axios.get(this.$baseUrl.article, {
+                this.$axios.get(this.$baseUrl.getErrorArticleList, {
                     params: {
                         pageNow: 1,
                         pageSize: 10
@@ -87,7 +87,9 @@ export default {
             ])
             .then(
                 this.$axios.spread((qStatus, testInfo, article) => {
-                    console.log(qStatus)
+                    // console.log(qStatus)
+                    // console.log(testInfo)
+                    console.log(article)
                     this.failQuestionInfo = qStatus.data
                     this.testInfo = testInfo.data
                     if (article.data.length == 0) {
@@ -150,20 +152,22 @@ export default {
                 this.showTip = true
             }
         },
-        getArticleErrorQuestion(name, id, status) {
+        getArticleErrorQuestion(name, id, status, categoryId) {
             this.$axios
                 .post(this.$baseUrl.getArticleErrorQuestion, {
                     articleId: id,
                     status
                 })
                 .then(res => {
+                    console.log(res)
                     this.$router.push({
                         name: 'analyze',
                         params: {
                             id,
                             name,
                             status,
-                            errorQuestion: res.data
+                            errorQuestion: res.data,
+                            categoryId
                         }
                     })
                 })
@@ -229,7 +233,7 @@ export default {
                 box-shadow: 0 0 2vw #ccc;
                 margin: 0 6.5vw 4vw;
                 display: grid;
-                grid-template-columns: 10% 18% 40% 32%;
+                grid-template-columns: 10% 13% 45% 32%;
                 align-items: center;
                 padding: 0 2vw;
                 .circle {
@@ -243,10 +247,11 @@ export default {
                     justify-self: center;
                     color: #4c443f;
                     font-weight: bold;
+                    font-size: 3.6vw;
                 }
                 .name {
                     color: #909090;
-                    font-size: 3.8vw;
+                    font-size: 3.6vw;
                 }
                 .status {
                     font-size: 2.8vw;

@@ -55,7 +55,7 @@ export default {
             user_rank: this.$handler.getStorage('personalRank'),
             user_score: this.$handler.getStorage('totalScore'),
             group: ['SR', 'DM', 'RSD', 'RMM'],
-            apiArr: ['personalRank', 'RMMAndDMRank?teamRank=DM', 'RSDRank', 'RMMAndDMRank?teamRank=RMM'],
+            apiArr: ['personalRank', 'teamRank?name=DM', 'teamRank?name=RSD', 'teamRank?name=RMM'],
             active: 0,
             rank: []
         }

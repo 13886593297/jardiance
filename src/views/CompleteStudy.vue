@@ -92,6 +92,7 @@ export default {
     padding-top: 15vw;
     .pic {
         width: 68vw;
+        height: 78.6vw;
     }
     .num {
         color: #494949;

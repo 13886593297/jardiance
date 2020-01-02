@@ -1,19 +1,22 @@
 <template>
     <div class="analyze">
-        <train-header :id="id" :name="name" :sectionEn="true" :curQNo="curQNo" :totalQ="totalQ"></train-header>
-        <div class="process-bar" ref="process_bar">
-            <div ref="process" v-for="i in totalQ.length" :key="i"></div>
-        </div>
-        <div class="question">
-            <div>
-                <p>题目{{totalQ[curQNo].id}} {{totalQ[curQNo].question}}</p>
-                <div>正确答案</div>
-                <p>{{qCorrect}}</p>
+        <train-header :id="id" :name="name" :sectionEn="true" :curQNo="totalQ.length - 1" :totalQ="totalQ"></train-header>
+        <div class="processDiv">
+            <div class="process-bar" ref="process_bar">
+                <div v-for="i in totalQ.length" :key="i"></div>
             </div>
         </div>
+        <ul class="question">
+            <template v-for="(item, key) in totalQ">
+                <li :key="key" v-if="!item.is_correct">
+                    <p>题目{{key + 1}} {{item.question}}</p>
+                    <div>正确答案</div>
+                    <p>{{item.correntAnwser}}</p>
+                </li>
+            </template>
+        </ul>
         <div class="btn" :class="{half: status == 2}">
-            <button @click="next" v-if="!isEnd">下一题</button>
-            <button @click="back" v-else>返回目录</button>
+            <button @click="back">返回目录</button>
             <button @click="restart" v-if="status == 2">重新答题</button>
         </div>
         <div class="refuse" v-show="refuse">
@@ -40,59 +43,46 @@ export default {
             id: this.$route.params.id,
             name: this.$route.params.name,
             status: this.$route.params.status,
-            curQNo: 0,
             totalQ: this.$route.params.errorQuestion,
+            categoryId: this.$route.params.categoryId,
             topic: '',
             qCorrect: '',
             options: [],
-            isEnd: false,
             refuse: false,
-            time: ''
-        }
-    },
-    mounted() {
-        this.$refs.process_bar.style.gridTemplateColumns = `repeat(${this.totalQ.length}, 1fr)`
-        this.init()
-    },
-    methods: {
-        init() {
-            for (let key in this.totalQ[this.curQNo]) {
-                if (this.totalQ[this.curQNo][key] != '') {
-                    if (
-                        key == 'anwser_a' ||
-                        key == 'anwser_b' ||
-                        key == 'anwser_c' ||
-                        key == 'anwser_d'
-                    ) {
-                        this.options.push(this.totalQ[this.curQNo][key])
-                    }
-                }
-            }
-
-            let obj = {
+            time: '',
+            obj: {
                 A: 0,
                 B: 1,
                 C: 2,
                 D: 3
             }
-            this.qCorrect = this.options[
-                obj[this.totalQ[this.curQNo].anwser_correct.trim()]
-            ]
-            this.$refs.process_bar.children[this.curQNo].style.backgroundColor =
-                '#fd7572'
-            if (this.totalQ.length == 1) {
-                this.isEnd = true
+        }
+    },
+    created() {
+        this.init()
+    },
+    mounted() {
+        this.$refs.process_bar.style.gridTemplateColumns = `repeat(${this.totalQ.length}, 1fr)`
+        this.totalQ.forEach((item, key) => {
+            if (item.is_correct) {
+                this.$refs.process_bar.children[key].style.backgroundColor = '#009b96'
+            } else {
+                this.$refs.process_bar.children[key].style.backgroundColor = '#fd7572'
             }
-        },
-        next() {
-            if (this.curQNo < this.totalQ.length - 1) {
-                this.curQNo += 1
-                this.init()
-            }
-
-            if (this.curQNo == this.totalQ.length - 1) {
-                this.isEnd = true
-            }
+        })
+    },
+    methods: {
+        init() {
+            this.totalQ.forEach(item => {
+                let correntQ = this.obj[item.anwser_correct.trim()]
+                let options = []
+                for (let key in item) {
+                    if (item[key] && key == 'anwser_a' || key == 'anwser_b' || key == 'anwser_c' || key == 'anwser_d') {
+                        options.push(item[key])
+                    }
+                }
+                item.correntAnwser = options[correntQ]
+            })
         },
         restart() {
             this.$axios
@@ -100,20 +90,12 @@ export default {
                     articleId: this.id
                 })
                 .then(res => {
-                    console.log(res)
                     if (res.data.status == 200) {
-                        // this.$router.replace({
-                        //     name: 'train',
-                        //     params: {
-                        //         id: this.id,
-                        //         name: this.name
-                        //     }
-                        // })
                         this.$router.replace({
                             name: 'details',
                             query: {
                                 id: this.id,
-                                name: this.name
+                                categoryId: this.categoryId
                             }
                         })
                     } else {
@@ -147,25 +129,34 @@ export default {
 </script>
 <style lang="scss" scoped>
 .analyze {
-    padding: 6.5vw;
-    .process-bar {
-        width: 100%;
-        height: 1.4vw;
+    .header {
+        padding: 6.5vw 6.5vw 0;
+    }
+    .processDiv {
+        padding: 0 6.5vw;
         margin-top: 8.5vw;
-        background-color: #f1f1f1;
-        border-radius: 4vw;
-        display: grid;
-        overflow: hidden;
-        gap: 1px;
+        .process-bar {
+            width: 100%;
+            height: 1.4vw;
+            background-color: #f1f1f1;
+            border-radius: 4vw;
+            display: grid;
+            overflow: hidden;
+            gap: 1px;
+        }
     }
     .question {
         height: 92vw;
-        margin-top: 7vw;
-        > div {
+        margin-top: 3vw;
+        margin-bottom: 4vw;
+        padding: 2vw 6.5vw;
+        overflow-y: scroll;
+        li {
             padding: 3vw 7vw;
             border-left: 1vw solid #fe7575;
             border-radius: 1vw;
             box-shadow: 0 0 2vw #ccc;
+            margin-bottom: 4vw;
             p {
                 color: #777777;
                 font-size: 4vw;
@@ -181,6 +172,7 @@ export default {
         }
     }
     .btn {
+        padding: 0 6.5vw;
         button {
             width: 100%;
             height: 10vw;

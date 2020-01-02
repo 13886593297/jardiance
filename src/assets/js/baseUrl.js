@@ -3,7 +3,7 @@ export default {
     userSign: '/api/users/userSign',
     trainIndex: '/api/train/index',
     trainStart: '/api/train/start',
-    article: '/api/train/article',
+    getArticleList: '/api/train/getArticleList',
     submitQuestion: '/api/train/submitQuestion',
     getSubmitTime: '/api/train/getSubmitTime',
     getArticleErrorQuestion: '/api/train/getArticleErrorQuestion',
@@ -12,8 +12,9 @@ export default {
     getArticleCategory: '/api/train/getArticleCategory',
     startReadArticle: '/api/train/startReadArticle',
     endReadArticle: '/api/train/endReadArticle',
-    getNextArticle: '/api/train/getNextArticle',
+    getArticleByArticleId: '/api/train/getArticleByArticleId',
     getLastMonthFailQuestionStatus: '/api/train/getLastMonthFailQuestionStatus',
-    getLastMonthFailQuestionList: 'api/train/getLastMonthFailQuestionList'
+    getLastMonthFailQuestionList: 'api/train/getLastMonthFailQuestionList',
+    getErrorArticleList: 'api/train/getErrorArticleList'
   }
   

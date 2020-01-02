@@ -102,6 +102,7 @@ export default {
         li {
             img {
                 width: 18.6vw;
+                height: 18.6vw;
             }
             .name {
                 font-size: 6vw;

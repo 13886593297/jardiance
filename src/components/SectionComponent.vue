@@ -3,7 +3,7 @@
         <div
             :style="{animationDelay: `${index * .5}s`}"
             :class="[ani ? 'fadeInLeft': '', section.trainStatus == 1 ? 'pass' : section.trainStatus == 2 ? 'fail' : 'continuing']"
-            @click="toDetails(section.id, section.trainStatus)"
+            @click="toDetails(section.id, section.category_id)"
         >
             <img :src="require(`../assets/img/section/${section.trainStatus}.png`)" alt />
             <p class="text" v-if="section.trainStatus == '2'">很遗憾，未通过测试，请继续努力！</p>
@@ -22,15 +22,14 @@
 
 <script>
 export default {
-    props: ['section', 'idArr', 'index', 'ani'],
+    props: ['section', 'index', 'ani'],
     methods: {
-        toDetails(id, status) {
+        toDetails(id, categoryId) {
             this.$router.push({
                 name: 'details',
                 query: {
                     id,
-                    status, // 0 continue 1 pass 2 fail
-                    idArr: this.idArr
+                    categoryId
                 }
             })
         }
@@ -68,6 +67,7 @@ export default {
 
         img {
             width: 17.3vw;
+            height: 16vw;
         }
         &.fail {
             background-color: var(--yellow);

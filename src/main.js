@@ -9,7 +9,7 @@ import './assets/css/base.scss'
 import Loading from 'vue-loading-overlay'
 import 'vue-loading-overlay/dist/vue-loading.css'
 
-new VConsole()
+// new VConsole()
 Vue.config.productionTip = false
 if (process.env.NODE_ENV == "development") {
     Axios.defaults.baseURL = 'http://192.168.1.101:8080'

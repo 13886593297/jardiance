@@ -3,7 +3,7 @@
         <train-header :id="id" :name="name" :sectionEn="true" :curQNo="curQNo" :totalQ="totalQ"></train-header>
         <tip v-show="showTip" title="OMG！" content="哎呀，您还没有选择答案哦！"></tip>
         <div class="process-bar" ref="process_bar">
-            <div ref="process" v-for="i in totalQ.length" :key="i"></div>
+            <div v-for="i in totalQ.length" :key="i"></div>
         </div>
         <div class="question" ref="question">
             <div class="qContent">
@@ -41,15 +41,18 @@
                     </div>
                 </div>
             </div>
-            <button class="submit" @click="submit" v-if="!isEnd">{{subText}}</button>
-            <button class="submit" @click="analyze" v-else>{{ errorNum == 0 ? '返回目录' : '题目分析' }}</button>
+            <button class="submit" @click="submit" v-if="show">{{subText}}</button>
+            <button class="submit" @click="analyze" v-if="isEnd">{{ errorNum == 0 ? '返回目录' : '题目分析' }}</button>
         </div>
     </div>
 </template>
 <script>
+import store from '../store'
+import { mapMutations } from 'vuex'
 import TrainHeader from '../components/TrainHeader'
 import Tip from '../components/Tip'
 export default {
+    store,
     components: { TrainHeader, Tip },
     data() {
         return {
@@ -63,6 +66,7 @@ export default {
             qCorrect: '', // 正确答案
             subText: '',
             isEnd: false,
+            show: true,
             correctNum: 0, // 正确题数
             score: 0, // 获得积分
             errorNum: 0, // 错误题数
@@ -71,6 +75,7 @@ export default {
         }
     },
     created() {
+        this.setInterceptor(false)
         this.$axios
             .post(this.$baseUrl.trainStart, {
                 article_id: this.id
@@ -85,7 +90,11 @@ export default {
                 }
             })
     },
+    beforeDestroy() {
+        this.setInterceptor(true)
+    },
     methods: {
+        ...mapMutations(['setInterceptor']),
         init() {
             this.topic = this.totalQ[this.curQNo].question
             this.qCorrect = this.totalQ[this.curQNo].anwser_correct.trim()
@@ -114,6 +123,9 @@ export default {
                     this.showTip = false
                 }, 2000)
                 return
+            }
+            if (this.subText == '提交') {
+                this.show = false
             }
             this.$refs.question.classList.add('disabled')
 
@@ -147,6 +159,7 @@ export default {
                         this.correctNum = res.data.correctNum
                         this.score = res.data.correctScore
                         this.errorQuestion = res.data.questionInfo || []
+                        console.log(this.errorQuestion)
                     }
                 })
 
@@ -204,6 +217,7 @@ export default {
         .qContent {
             height: 92vw;
             overflow-x: scroll;
+            margin-bottom: 4vw;
             .topic {
                 display: grid;
                 grid-template-columns: 3vw auto;

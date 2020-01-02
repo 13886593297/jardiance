@@ -28,14 +28,14 @@
 
 <script>
 import pdf from 'vue-pdf'
+import CMapReaderFactory from 'vue-pdf/src/CMapReaderFactory.js'
 import Tip from '../components/Tip'
 export default {
     components: { pdf, Tip },
     data() {
         return {
             id: this.$route.query.id,
-            status: this.$route.query.status,
-            idArr: this.$route.query.idArr || [],
+            categoryId: this.$route.query.categoryId,
             name: '',
             pdf: '',
             sectionNo: '',
@@ -43,19 +43,20 @@ export default {
             currentPage: 0,
             pageCount: 0,
             uuid: '',
-            index: 0,
-            showTip: false
+            showTip: false,
+            nextArticleId: null,
+            trainStatus: null
         }
     },
     created() {
-        // this.pdf = pdf.createLoadingTask(this.pdf)
-        this.index = this.idArr.indexOf(this.id)
-        this.$axios.all([this.startReadArticle(), this.getNextArticle()]).then(
-            this.$axios.spread((read, next) => {
+        this.$axios.all([this.startReadArticle(), this.getArticleByArticleId()]).then(
+            this.$axios.spread((read, articleList) => {
+                // console.log(articleList.data[0][0])
                 this.uuid = read.data.uuid
-                this.id = next.data[0].id
-                this.name = next.data[0].name
-                this.pdf = next.data[0].pdf
+                this.name = articleList.data[0][0].name
+                this.nextArticleId = articleList.data[0][0].nextArticleId
+                this.trainStatus = articleList.data[0][0].trainStatus
+                this.pdf = pdf.createLoadingTask({ url: articleList.data[0][0].pdf, CMapReaderFactory })
             })
         )
     },
@@ -75,24 +76,34 @@ export default {
                 articleId: this.id
             })
         },
-        getNextArticle() {
-            return this.$axios.post(this.$baseUrl.getNextArticle, {
-                articleId: this.idArr[this.index] || this.id
+        getArticleByArticleId() {
+            return this.$axios.get(this.$baseUrl.getArticleByArticleId, {
+                params: {
+                    articleId: this.id,
+                    categoryId: this.categoryId
+                }
             })
         },
         next() {
-            this.index++
-            if (this.index >= this.idArr.length) {
+            if (this.nextArticleId == -1) {
                 this.showTip = true
                 setTimeout(() => {
                     this.showTip = false
                 }, 2000)
                 return
             } else {
-                this.getNextArticle().then(res => {
-                    this.id = res.data[0].id
-                    this.name = res.data[0].name
-                    this.pdf = res.data[0].pdf
+                this.$axios.get(this.$baseUrl.getArticleByArticleId, {
+                params: {
+                    articleId: this.nextArticleId,
+                    categoryId: this.categoryId
+                }
+                }).then(res => {
+                    console.log(res.data[0][0])
+                    this.id = res.data[0][0].id
+                    this.name = res.data[0][0].name
+                    this.nextArticleId = res.data[0][0].nextArticleId
+                    this.trainStatus = res.data[0][0].trainStatus
+                    this.pdf = pdf.createLoadingTask({ url: res.data[0][0].pdf, CMapReaderFactory })
                 })
             }
         },
@@ -100,31 +111,27 @@ export default {
             if (val === 0 && this.currentPage > 1) {
                 this.currentPage--
             }
-            if (val === 1 && this.currentPage < this.pageCount) {
-                this.currentPage++
-                if (process.env.NODE_ENV == 'development') {
-                    if (this.currentPage == 2) {
-                        this.$router.replace({
-                            name: 'completeStudy',
-                            query: {
-                                id: this.id,
-                                name: this.name,
-                                status: this.status
-                            }
-                        })
+            if (val === 1) {
+                // if (this.currentPage < this.pageCount) {
+                //     this.currentPage++
+                // } else {
+                //     this.$router.replace({
+                //         name: 'completeStudy',
+                //         query: {
+                //             id: this.id,
+                //             name: this.name,
+                //             status: this.trainStatus
+                //         }
+                //     })
+                // }
+                this.$router.replace({
+                    name: 'completeStudy',
+                    query: {
+                        id: this.id,
+                        name: this.name,
+                        status: this.trainStatus
                     }
-                } else {
-                    if (this.currentPage == this.pageCount) {
-                        this.$router.replace({
-                            name: 'completeStudy',
-                            query: {
-                                id: this.id,
-                                name: this.name,
-                                status: this.status
-                            }
-                        })
-                    }
-                }
+                })
             }
         },
         // pdf加载时

@@ -15,7 +15,7 @@
                     v-for="(item, key) in list"
                     :key="key"
                     :class="{fail: item.trainStatus == 2, pass: item.trainStatus == 1, normal: item.trainStatus == 0}"
-                    @click="toDetails(item.id, item.name, item.trainStatus)"
+                    @click="toDetails(item.id, item.category_id)"
                 >
                     <div class="top">
                         <div>
@@ -38,15 +38,19 @@
 
 <script>
 export default {
+    name: 'medical',
     data() {
         return {
             titleArr: [],
-            active: 0,
+            active: window.sessionStorage.getItem('medicalActive') || 0,
             list: []
         }
     },
     created() {
         this.init()
+    },
+    destroyed() {
+        window.sessionStorage.setItem('medicalActive', this.active)
     },
     filters: {
         timeformat(time) {
@@ -65,7 +69,7 @@ export default {
         },
         getTypeData() {
             this.$axios
-                .get(this.$baseUrl.article, {
+                .get(this.$baseUrl.getArticleList, {
                     params: {
                         categoryId: this.titleArr[this.active].id,
                         pageNow: 1,
@@ -73,14 +77,14 @@ export default {
                     }
                 })
                 .then(res => {
-                    console.log(res)
-                    this.list = res.data.reverse()
+                    this.list = res.data
                 })
         },
-        toDetails(id, name, status) {
+
+        toDetails(id, categoryId) {
             this.$router.push({
                 name: 'details',
-                query: { id, name, status }
+                query: { id, categoryId }
             })
         },
         goHome() {
