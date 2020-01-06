@@ -125,7 +125,6 @@ export default {
                 }
                 if (this.currentPage < this.pageCount) {
                     this.currentPage++
-            console.log(this.currentPage)
                 } else {
                     this.changeRoute()
                 }
