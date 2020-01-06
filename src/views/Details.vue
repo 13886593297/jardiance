@@ -4,7 +4,8 @@
         <div class="header">
             <div class="header-arrow">
                 <img src="../assets/img/details/back.png" @click="back" alt />
-                <h4>SECTION{{id}}</h4>
+                <h4 v-if="!from">SECTION{{id}}</h4>
+                <h4 v-else class="small">欧唐静产品介绍应用习题</h4>
                 <img src="../assets/img/details/next.png" @click="next" alt />
             </div>
             <p class="header-title">{{name}}</p>
@@ -15,7 +16,7 @@
                 :src="pdf"
                 :page="currentPage"
                 @num-pages="pageCount = $event"
-                @page-loaded="currentPage = $event"
+                @page-loaded="pageLoaded($event)"
                 @loaded="loadPdfHandler"
             ></pdf>
             <div class="slip">
@@ -36,12 +37,14 @@ export default {
         return {
             id: this.$route.query.id,
             categoryId: this.$route.query.categoryId,
+            from: this.$route.query.from || '',
             name: '',
             pdf: '',
             sectionNo: '',
             summary: '',
             currentPage: 0,
             pageCount: 0,
+            ableClick: false,
             uuid: '',
             showTip: false,
             nextArticleId: null,
@@ -107,32 +110,36 @@ export default {
                 })
             }
         },
+        pageLoaded($event) {
+            this.currentPage = $event
+            this.ableClick = true
+        },
         changePdfPage(val) {
+            if (!this.ableClick) return
             if (val === 0 && this.currentPage > 1) {
                 this.currentPage--
+            } else if (val === 1) {
+                if (process.env.NODE_ENV == "development") {
+                        this.changeRoute()
+                    return
+                }
+                if (this.currentPage < this.pageCount) {
+                    this.currentPage++
+            console.log(this.currentPage)
+                } else {
+                    this.changeRoute()
+                }
             }
-            if (val === 1) {
-                // if (this.currentPage < this.pageCount) {
-                //     this.currentPage++
-                // } else {
-                //     this.$router.replace({
-                //         name: 'completeStudy',
-                //         query: {
-                //             id: this.id,
-                //             name: this.name,
-                //             status: this.trainStatus
-                //         }
-                //     })
-                // }
-                this.$router.replace({
-                    name: 'completeStudy',
-                    query: {
-                        id: this.id,
-                        name: this.name,
-                        status: this.trainStatus
-                    }
-                })
-            }
+        },
+        changeRoute() {
+            this.$router.replace({
+                name: 'completeStudy',
+                query: {
+                    id: this.id,
+                    name: this.name,
+                    status: this.trainStatus
+                }
+            })    
         },
         // pdf加载时
         loadPdfHandler(e) {
@@ -160,6 +167,9 @@ export default {
                 color: #4d3433;
                 font-size: 5vw;
                 font-weight: 400;
+                &.small {
+                    font-size: 4vw;
+                }
             }
         }
         .header-title {

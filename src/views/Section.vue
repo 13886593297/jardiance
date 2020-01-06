@@ -14,10 +14,13 @@
     </div>
 </template>
 <script>
+import store from '../store'
+import { mapMutations } from 'vuex'
 import SearchHeader from '../components/SearchHeader'
 import SectionComponent from '../components/SectionComponent'
 import Tip from '../components/Tip'
 export default {
+    store,
     data() {
         return {
             id: this.$route.query.id,
@@ -32,6 +35,7 @@ export default {
         Tip
     },
     created() {
+        this.setInterceptor(false)
         this.$axios
             .get(this.$baseUrl.getArticleList, {
                 params: {
@@ -41,12 +45,16 @@ export default {
                 }
             })
             .then(res => {
-                console.log(res)
+                // console.log(res)
                 this.sections = res.data
                 this.$refs.container.style.gridTemplateRows = `repeat(${this.sections.length}, 42vw)`
             })
     },
+    beforeDestroy() {
+        this.setInterceptor(true)
+    },
     methods: {
+        ...mapMutations(['setInterceptor']),
         getChildData(val) {
             this.sections = []
             this.ani = true

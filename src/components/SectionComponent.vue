@@ -9,7 +9,7 @@
             <p class="text" v-if="section.trainStatus == '2'">很遗憾，未通过测试，请继续努力！</p>
             <p class="text" v-if="section.trainStatus == '1'">恭喜您已通过本章测试！</p>
             <p class="text" v-if="section.trainStatus == '0'">快来学习本章内容吧！</p>
-            <p class="no">SECTION{{section.id}}</p>
+            <p class="number">SECTION{{section.sort}}</p>
             <p class="name">{{section.name}}</p>
             <div class="go">
                 <span></span>
@@ -93,7 +93,7 @@ export default {
             font-size: 2.8vw;
             color: var(--yellow);
         }
-        .no {
+        .number {
             color: #fff;
             font-size: 7vw;
         }

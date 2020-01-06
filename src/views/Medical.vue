@@ -37,7 +37,10 @@
 </template>
 
 <script>
+import store from '../store'
+import { mapMutations } from 'vuex'
 export default {
+    store,
     name: 'medical',
     data() {
         return {
@@ -48,9 +51,11 @@ export default {
     },
     created() {
         this.init()
+        this.setInterceptor(false)
     },
     destroyed() {
         window.sessionStorage.setItem('medicalActive', this.active)
+        this.setInterceptor(true)
     },
     filters: {
         timeformat(time) {
@@ -59,6 +64,7 @@ export default {
         }
     },
     methods: {
+        ...mapMutations(['setInterceptor']),
         init() {
             this.$axios
                 .post(this.$baseUrl.trainIndex, { type: '医讯速递' })
@@ -84,7 +90,7 @@ export default {
         toDetails(id, categoryId) {
             this.$router.push({
                 name: 'details',
-                query: { id, categoryId }
+                query: { id, categoryId, from: 'medical' }
             })
         },
         goHome() {

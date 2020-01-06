@@ -250,6 +250,7 @@ export default {
             left: 0;
             width: 100%;
             height: 100%;
+            z-index: 111;
             background-color: rgba(0, 0, 0, 0.6);
             > div {
                 padding-top: 10vw;

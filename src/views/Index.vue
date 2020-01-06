@@ -73,24 +73,18 @@ export default {
     created() {
         // userCode 2 正常 1 没有这个用户
         this.$axios.get(this.$baseUrl.userInfo).then(res => {
-            // if (res.data.userCode == 2) {
-            //     this.userInfo = res.data.reUserInfo
-            //     window.sessionStorage.setItem('user', JSON.stringify(res.data.reUserInfo))
-            //     let processWidth = this.userInfo.totalTrain / this.userInfo.totalQuestion
-            //     this.$refs.process.style.width = Math.floor(processWidth * 100) + '%'
-            // } else {
-            //     alert('无权限访问')
-            //     setTimeout(() => {
-            //         WeixinJSBridge.call('closeWindow')
-            //     }, 100)
-            // }
             if (typeof res.data == 'string') {
                 window.location.href = res.data
-            } else {
+            } else if (res.data.userCode == 2) {
                 this.userInfo = res.data.reUserInfo
                 window.sessionStorage.setItem('user', JSON.stringify(res.data.reUserInfo))
                 let processWidth = this.userInfo.totalTrain / this.userInfo.totalQuestion
                 this.$refs.process.style.width = Math.floor(processWidth * 100) + '%'
+            } else {
+                alert('无权限访问')
+                setTimeout(() => {
+                    WeixinJSBridge.call('closeWindow')
+                }, 100)
             }
         })
     },

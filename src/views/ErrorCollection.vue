@@ -3,7 +3,6 @@
         <p class="title">错题月考</p>
         <div
             @click="toErrorTrain"
-            v-if="failQuestionInfo.status"
             :class="['section', {pass: failQuestionInfo.status > 1}]"
         >
             <p class="month">Month {{failQuestionInfo.month}}</p>
@@ -28,7 +27,7 @@
                     <div
                         class="status"
                         v-if="item.trainStatus == 2 && item.arttcleTime.status == 200"
-                    >FALL</div>
+                    >FAIL</div>
                     <div
                         class="status"
                         v-if="item.trainStatus == 2 && item.arttcleTime.status == 201"
@@ -42,7 +41,7 @@
         </div>
         <div class="tip" v-show="showTip">
             <div>
-                <img src="../assets/img/error/2.jpg" alt />
+                <img class="pic" src="../assets/img/error/2.jpg" alt />
                 <div>
                     <p>您已提交过答案</p>
                     正确 {{testInfo.successNum}}道
@@ -55,6 +54,19 @@
                     <br />加油！
                 </div>
                 <img class="colse" src="../assets/img/details/close.png" @click="showTip = false" alt />
+            </div>
+        </div>
+        <div class="tip emptyQ" v-show="emptyQ">
+            <div>
+                <img class="pic" src="../assets/img/error/3.jpg" alt />
+                <div>
+                    <p>哦！题库空空！</p>
+                    您还没有答错的题目哦！
+                    <br />
+                    <span>快去答题吧</span>
+                    <br />加油！
+                </div>
+                <img class="colse" src="../assets/img/details/close.png" @click="emptyQ = false" alt />
             </div>
         </div>
     </div>
@@ -70,14 +82,14 @@ export default {
             testInfo: {},
             allErrQ: [],
             noQues: false,
-            showTip: false
+            showTip: false,
+            emptyQ: false
         }
     },
     created() {
         this.$axios
             .all([
                 this.$axios.get(this.$baseUrl.getLastMonthFailQuestionStatus),
-                this.$axios.post(this.$baseUrl.getTestTime),
                 this.$axios.get(this.$baseUrl.getErrorArticleList, {
                     params: {
                         pageNow: 1,
@@ -86,12 +98,10 @@ export default {
                 })
             ])
             .then(
-                this.$axios.spread((qStatus, testInfo, article) => {
-                    // console.log(qStatus)
-                    // console.log(testInfo)
+                this.$axios.spread((qStatus, article) => {
+                    console.log(qStatus)
                     console.log(article)
                     this.failQuestionInfo = qStatus.data
-                    this.testInfo = testInfo.data
                     if (article.data.length == 0) {
                         this.noQues = true
                     } else {
@@ -140,7 +150,10 @@ export default {
             }, 1000)
         },
         toErrorTrain() {
-            if (this.failQuestionInfo.status == 1) {
+            // 0 没有题目  1 未答题  2 已答题
+            if (this.failQuestionInfo.status == 0) {
+                this.emptyQ = true
+            } else if (this.failQuestionInfo.status == 1) {
                 this.$router.push({
                     name: 'errorTrain',
                     query: {
@@ -149,7 +162,10 @@ export default {
                     }
                 })
             } else {
-                this.showTip = true
+                this.$axios.post(this.$baseUrl.getTestTime).then(res => {
+                    this.testInfo = res.data
+                    this.showTip = true
+                })
             }
         },
         getArticleErrorQuestion(name, id, status, categoryId) {
@@ -313,7 +329,7 @@ export default {
             margin: 30vw auto 0;
             text-align: center;
             position: relative;
-            img {
+            .pic {
                 width: 24vw;
                 margin-top: 5vw;
             }
@@ -356,6 +372,13 @@ export default {
                 background-color: #fff;
                 position: absolute;
                 bottom: -7vw;
+            }
+        }
+        &.emptyQ {
+            > div {
+                .pic {
+                    width: 28.8vw;
+                }
             }
         }
     }
