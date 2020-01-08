@@ -37,7 +37,9 @@
             <div class="noQues" v-else>
                 <img src="../assets/img/error/1.jpg" alt />
             </div>
-            <button @click="goHome">返回首页</button>
+            <div class="btn">
+                <button @click="goHome">返回首页</button>
+            </div>
         </div>
         <div class="tip" v-show="showTip">
             <div>
@@ -115,10 +117,7 @@ export default {
             article.data.forEach(item => {
                 if (item.trainStatus == 2 && item.arttcleTime.status == 200) {
                     item._status = 3
-                } else if (
-                    item.trainStatus == 2 &&
-                    item.arttcleTime.status == 201
-                ) {
+                } else if (item.trainStatus == 2 && item.arttcleTime.status == 201) {
                     item._status = 2
                 } else if (item.trainStatus == 1) {
                     item._status = 1
@@ -129,25 +128,31 @@ export default {
             article.data.sort((a, b) => {
                 return b._status - a._status
             })
-            setInterval(() => {
-                this.allErrQ = []
-                article.data.forEach(item => {
-                    if (item.arttcleTime.status != 200) {
-                        let expireTime = new Date(item.arttcleTime.time).getTime()
-                        let nowTime = new Date().getTime()
-                        let diff = (expireTime - nowTime) / 1000
+            this.formatTime(article)
+        },
+        formatTime(article) {
+            this.allErrQ = []
+            article.data.forEach(item => {
+                if (item.arttcleTime.status != 200) {
+                    let diff = parseInt(item.arttcleTime.time)
+                    let h = Math.floor(diff / 3600)
+                    let m = Math.floor((diff / 60) % 60)
+                    let s = Math.floor(diff % 60)
+                    item.arttcleTime.formatTime = `还剩 ${h}h ${m}min ${s}s`
+                    setInterval(() => {
+                        diff--
                         if (diff > 0) {
-                            let h = Math.floor(diff / 3600)
-                            let m = Math.floor((diff / 60) % 60)
-                            let s = Math.floor(diff % 60)
+                            h = Math.floor(diff / 3600)
+                            m = Math.floor((diff / 60) % 60)
+                            s = Math.floor(diff % 60)
                             item.arttcleTime.formatTime = `还剩 ${h}h ${m}min ${s}s`
                         } else {
                             item.arttcleTime.status = 200
                         }
-                    }
-                    this.allErrQ.push(item)
-                })
-            }, 1000)
+                    }, 1000);
+                }
+                this.allErrQ.push(item)
+            })
         },
         toErrorTrain() {
             // 0 没有题目  1 未答题  2 已答题
@@ -240,7 +245,7 @@ export default {
         ul {
             margin-top: 2vw;
             padding-top: 2vw;
-            height: 74vw;
+            height: 54vh;
             overflow-y: scroll;
             box-sizing: border-box;
             li {
@@ -292,17 +297,20 @@ export default {
                 }
             }
         }
-        button {
-            margin: 0 auto;
-            display: block;
-            height: 9vw;
-            line-height: 9vw;
-            width: 53vw;
-            border-radius: 5vw;
-            background-color: #009b96;
-            color: #fff;
-            font-size: 5vw;
-            margin-top: 3vw;
+        .btn {
+            position: absolute;
+            width: 100%;
+            bottom: 4vw;
+            text-align: center;
+            button {
+                height: 9vw;
+                line-height: 9vw;
+                width: 53vw;
+                border-radius: 5vw;
+                background-color: #009b96;
+                color: #fff;
+                font-size: 5vw;
+            }
         }
         .noQues {
             height: 72vw;

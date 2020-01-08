@@ -4,7 +4,7 @@
         <h4 :class="{hide: ani}">{{title}}</h4>
         <div class="searchDiv" :class="{ani, backAni, whirl}" @click="ani = true">
             <img class="searchImg" src="../assets/img/trainIndex/search.png" alt />
-            <input type="text" class="searchInput" v-model.trim="searchText" @blur="blur" />
+            <input type="text" class="searchInput" v-model.trim="searchText" @blur="blur" :disabled="isdisabled" />
         </div>
     </div>
 </template>
@@ -20,7 +20,8 @@ export default {
             searchText: '',
             ani: false, // 开始动画
             backAni: false, // 回来的动画
-            whirl: false // 转圈动画
+            whirl: false, // 转圈动画
+            isdisabled: false
         }
     },
     props: ['name', 'id'],
@@ -34,6 +35,7 @@ export default {
         },
         search() {
             if (this.searchText) {
+                this.isdisabled = true
                 let text = this.searchText
                 this.backAni = true
                 this.title = 'Seaching...'
@@ -50,6 +52,7 @@ export default {
                     this.$axios
                         .post(this.$baseUrl.getArticleCategory, params)
                         .then(res => {
+                            this.isdisabled = false
                             this.$emit('getChildData', res)
                             this.title = text
                             this.backAni = false

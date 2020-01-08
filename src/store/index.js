@@ -4,12 +4,12 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
     state: {
-        loading: true,
+        loading: false,
         interceptor: true
     },
     mutations: {
         show(state) {
-            state.loading = true
+            state.loading = false
         },
         hide(state) {
             state.loading = false

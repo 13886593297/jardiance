@@ -11,7 +11,7 @@
         </div>
         <div class="question" ref="question">
             <div class="qContent">
-                <div class="answerArea">
+                <div class="answerArea" v-show="!isEnd">
                     <div class="topic">
                         <span></span>
                         <span>{{topic}}</span>
@@ -27,18 +27,28 @@
                     </ul>
                 </div>
                 <div class="complete" v-show="isEnd">
-                    <div>
-                        <img src="../assets/img/error/complete.png" alt />
+                    <div class="success" v-show="!errorNum">
+                        <img src="../assets/img/train/success.png" alt />
                         <p>
-                            恭喜！答对{{correctNum}}道题！
-                            <br />获得
-                            <span class="score">{{correctNum}}</span>积分
+                            恭喜您全部答对获得
+                            <br />
+                            <span class="score">{{score}}</span>积分
                         </p>
-                        <button @click="back">返回</button>
+                    </div>
+                    <div class="fail" v-show="errorNum">
+                        <img src="../assets/img/train/fail.png" alt />
+                        <p>
+                            正确{{correctNum}}道，获得{{score}}积分，错误题数
+                            <span class="score">{{errorNum}}</span>题，
+                        </p>
+                        <p>详见题目分析，您可在三天后重新答题。</p>
                     </div>
                 </div>
             </div>
-            <button class="submit" @click="submit" v-if="show">{{subText}}</button>
+            <div class="btn">
+                <button class="submit" @click="submit" v-if="show">{{subText}}</button>
+                <button class="submit" @click="back" v-if="isEnd">返回</button>
+            </div>
         </div>
     </div>
 </template>
@@ -58,7 +68,9 @@ export default {
             qCorrect: '', // 正确答案
             subText: '',
             isEnd: false,
+            errorNum: 0,
             show: true,
+            score: 0,
             correctNum: 0 // 正确题数
         }
     },
@@ -143,7 +155,8 @@ export default {
                 isEnd: this.curQNo == this.totalQ.length - 1
             }).then(res => {
                 console.log(res)
-                this.correctNum = res.data.successScore
+                this.score = res.data.successScore
+                this.correctNum = res.data.successNum
             })
 
             if (isCorrect) {
@@ -151,6 +164,7 @@ export default {
                 this.$refs.process_bar.children[this.curQNo].style.backgroundColor = '#009b96'
                 
             } else {
+                this.errorNum += 1
                 this.$refs.li[this.answer].classList = 'err'
                 this.$refs.process_bar.children[this.curQNo].style.backgroundColor = '#fd7572'
             }
@@ -193,7 +207,7 @@ export default {
             pointer-events: none;
         }
         .qContent {
-            height: 92vw;
+            height: 58vh;
             overflow-x: scroll;
             margin-bottom: 4vw;
             .topic {
@@ -233,55 +247,84 @@ export default {
                 }
             }
         }
-        .submit {
+        .btn {
+            position: absolute;
+            text-align: center;
             width: 100%;
-            height: 10vw;
-            line-height: 10vw;
-            border-radius: 10vw;
-            font-size: 4.8vw;
-            background-color: #f6c939;
-            font-weight: 600;
-            color: #fff;
+            bottom: 4vw;
+            left: 0;
+            button {
+                width: 87vw;
+                height: 10vw;
+                line-height: 10vw;
+                border-radius: 10vw;
+                font-size: 4.8vw;
+                background-color: #f6c939;
+                font-weight: 600;
+                color: #fff;
+            }
         }
         .complete {
+            // text-align: center;
+            // position: absolute;
+            // top: 0;
+            // left: 0;
+            // width: 100%;
+            // height: 100%;
+            // z-index: 111;
+            // background-color: rgba(0, 0, 0, 0.6);
+            // > div {
+            //     padding-top: 10vw;
+            //     position: relative;
+            //     img {
+            //         width: 66.6vw;
+            //     }
+            //     p {
+            //         color: #fff;
+            //         font-size: 5.3vw;
+            //         position: absolute;
+            //         width: 100%;
+            //         bottom: 21vw;
+            //     }
+            //     button {
+            //         width: 55vw;
+            //         height: 11vw;
+            //         line-height: 11vw;
+            //         color: #fff;
+            //         background-color: #f6c939;
+            //         font-size: 6vw;
+            //         letter-spacing: 6vw;
+            //         border-radius: 6vw;
+            //         text-indent: 6vw;
+            //         margin-top: 2vw;
+            //     }
+            //     .score {
+            //         font-size: 10vw;
+            //         color: #f6c939;
+            //         margin-right: 2vw;
+            //     }
+            // }
+            // .fail {
+            //     img {
+            //         width: 53.3vw;
+            //     }
+            // }
+
             text-align: center;
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 111;
-            background-color: rgba(0, 0, 0, 0.6);
-            > div {
-                padding-top: 10vw;
-                position: relative;
+            .success {
                 img {
-                    width: 66.6vw;
+                    width: 72vw;
                 }
-                p {
-                    color: #fff;
-                    font-size: 5.3vw;
-                    position: absolute;
-                    width: 100%;
-                    bottom: 21vw;
+            }
+            .fail {
+                img {
+                    width: 53.3vw;
                 }
-                button {
-                    width: 55vw;
-                    height: 11vw;
-                    line-height: 11vw;
-                    color: #fff;
-                    background-color: #f6c939;
-                    font-size: 6vw;
-                    letter-spacing: 6vw;
-                    border-radius: 6vw;
-                    text-indent: 6vw;
-                    margin-top: 2vw;
-                }
-                .score {
-                    font-size: 10vw;
-                    color: #f6c939;
-                    margin-right: 2vw;
-                }
+            }
+            .score {
+                font-size: 10vw;
+                color: var(--yellow);
+                margin-right: 2vw;
             }
         }
     }

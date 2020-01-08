@@ -54,7 +54,10 @@ const routes = [
         path: '/train',
         name: 'train',
         component: () =>
-            import(/* webpackChunkName: "train" */ '../views/Train.vue')
+            import(/* webpackChunkName: "train" */ '../views/Train.vue'),
+        meta: {
+            title: '基础培训'
+        }
     },
     {
         path: '/analyze',
@@ -112,7 +115,6 @@ const routes = [
 ]
 
 const router = new VueRouter({
-    // mode: 'history',
     base: process.env.BASE_URL,
     routes
 })

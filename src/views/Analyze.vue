@@ -8,7 +8,7 @@
         </div>
         <ul class="question">
             <template v-for="(item, key) in totalQ">
-                <li :key="key" v-if="!item.is_correct">
+                <li :key="key" v-if="item.is_correct == 2">
                     <p>题目{{key + 1}} {{item.question}}</p>
                     <div>正确答案</div>
                     <p>{{item.correntAnwser}}</p>
@@ -64,7 +64,7 @@ export default {
     mounted() {
         this.$refs.process_bar.style.gridTemplateColumns = `repeat(${this.totalQ.length}, 1fr)`
         this.totalQ.forEach((item, key) => {
-            if (item.is_correct) {
+            if (item.is_correct == 1) {
                 this.$refs.process_bar.children[key].style.backgroundColor = '#009b96'
             } else {
                 this.$refs.process_bar.children[key].style.backgroundColor = '#fd7572'
@@ -73,6 +73,7 @@ export default {
     },
     methods: {
         init() {
+            console.log(this.totalQ)
             this.totalQ.forEach(item => {
                 let correntQ = this.obj[item.anwser_correct.trim()]
                 let options = []
@@ -146,7 +147,7 @@ export default {
         }
     }
     .question {
-        height: 92vw;
+        height: 56vh;
         margin-top: 3vw;
         margin-bottom: 4vw;
         padding: 2vw 6.5vw;
@@ -173,6 +174,10 @@ export default {
     }
     .btn {
         padding: 0 6.5vw;
+        position: absolute;
+        width: 100%;
+        box-sizing: border-box;
+        bottom: 4vw;
         button {
             width: 100%;
             height: 10vw;

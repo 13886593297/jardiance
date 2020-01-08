@@ -4,7 +4,7 @@
         <div class="header">
             <div class="header-arrow">
                 <img src="../assets/img/details/back.png" @click="back" alt />
-                <h4 v-if="!from">SECTION{{id}}</h4>
+                <h4 v-if="categoryId < 3">SECTION{{id}}</h4>
                 <h4 v-else class="small">欧唐静产品介绍应用习题</h4>
                 <img src="../assets/img/details/next.png" @click="next" alt />
             </div>
@@ -37,7 +37,6 @@ export default {
         return {
             id: this.$route.query.id,
             categoryId: this.$route.query.categoryId,
-            from: this.$route.query.from || '',
             name: '',
             pdf: '',
             sectionNo: '',
@@ -52,6 +51,9 @@ export default {
         }
     },
     created() {
+        if (this.categoryId > 2) {
+            document.title = '医讯速递'
+        }
         this.$axios.all([this.startReadArticle(), this.getArticleByArticleId()]).then(
             this.$axios.spread((read, articleList) => {
                 // console.log(articleList.data[0][0])
@@ -136,7 +138,8 @@ export default {
                 query: {
                     id: this.id,
                     name: this.name,
-                    status: this.trainStatus
+                    status: this.trainStatus,
+                    categoryId: this.categoryId
                 }
             })    
         },

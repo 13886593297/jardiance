@@ -42,7 +42,9 @@
                 </li>
             </ul>
         </div>
-        <button @click="goHome">返回首页</button>
+        <div class="btn">
+            <button @click="goHome">返回首页</button>
+        </div>
     </div>
 </template>
 
@@ -157,7 +159,7 @@ export default {
                 }
             }
             &:nth-of-type(2) {
-                height: 68vw;
+                height: 40vh;
                 overflow-y: scroll;
                 margin-top: 3vw;
                 img {
@@ -192,17 +194,22 @@ export default {
             }
         }
     }
-    button {
-        margin: 0 auto;
-        display: block;
-        height: 9vw;
-        line-height: 9vw;
-        width: 53vw;
-        border-radius: 5vw;
-        background-color: #009b96;
-        color: #fff;
-        font-size: 5vw;
-        margin-top: 3vw;
+    .btn {
+        position: absolute;
+        width: 100%;
+        left: 0;
+        bottom: 4vw;
+        text-align: center;
+        box-sizing: border-box;
+        button {
+            height: 9vw;
+            line-height: 9vw;
+            width: 53vw;
+            border-radius: 5vw;
+            background-color: #009b96;
+            color: #fff;
+            font-size: 5vw;
+        }
     }
 }
 </style>

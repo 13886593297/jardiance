@@ -90,7 +90,7 @@ export default {
         toDetails(id, categoryId) {
             this.$router.push({
                 name: 'details',
-                query: { id, categoryId, from: 'medical' }
+                query: { id, categoryId }
             })
         },
         goHome() {

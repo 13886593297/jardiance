@@ -41,8 +41,10 @@
                     </div>
                 </div>
             </div>
-            <button class="submit" @click="submit" v-if="show">{{subText}}</button>
-            <button class="submit" @click="analyze" v-if="isEnd">{{ errorNum == 0 ? '返回目录' : '题目分析' }}</button>
+            <div class="btn">
+                <button class="submit" @click="submit" v-if="show">{{subText}}</button>
+                <button class="submit" @click="analyze" v-if="isEnd">{{ errorNum == 0 ? '返回目录' : '题目分析' }}</button>
+            </div>
         </div>
     </div>
 </template>
@@ -58,6 +60,7 @@ export default {
         return {
             id: this.$route.params.id,
             name: this.$route.params.name,
+            categoryId: this.$route.params.categoryId,
             curQNo: 0, // 当前第几道题
             totalQ: [], // 全部题目
             topic: '', // 题目
@@ -71,11 +74,15 @@ export default {
             score: 0, // 获得积分
             errorNum: 0, // 错误题数
             errorQuestion: [],
-            showTip: false
+            showTip: false,
+            len: 0
         }
     },
     created() {
         this.setInterceptor(false)
+        if (this.categoryId > 2) {
+            document.title = '医讯速递'
+        }
         this.$axios
             .post(this.$baseUrl.trainStart, {
                 article_id: this.id
@@ -84,9 +91,24 @@ export default {
                 if (res.status == 200) {
                     console.log(res)
                     this.totalQ = res.data
-                    this.init()
+                    console.log(this.totalQ)
                     this.$refs.process_bar.style.gridTemplateColumns = `repeat(${this.totalQ.length}, 1fr)`
-                    this.subText = this.totalQ.length > 1 ? '下一题' : '提交'
+                    this.$nextTick(() => {
+                        this.totalQ.forEach((item, i) => {
+                            if (item.is_correct == 1) {
+                                this.$refs.process_bar.children[i].style.backgroundColor = '#009b96'
+                            } else if (item.is_correct == 2) {
+                                this.$refs.process_bar.children[i].style.backgroundColor = '#fd7572'
+                            } else {
+                                this.len++
+                            }
+                        })
+                        this.subText = this.len > 1 ? '下一题' : '提交'
+                        this.curQNo = this.totalQ.findIndex(item => {
+                            return item.is_correct == 0
+                        })
+                        this.init()
+                    })
                 }
             })
     },
@@ -96,6 +118,7 @@ export default {
     methods: {
         ...mapMutations(['setInterceptor']),
         init() {
+            console.log(this.totalQ)
             this.topic = this.totalQ[this.curQNo].question
             this.qCorrect = this.totalQ[this.curQNo].anwser_correct.trim()
             // console.log('正确答案为', this.qCorrect)
@@ -144,8 +167,8 @@ export default {
 
             // 把玩家选择的0，1，2，3转化成A，B，C，D
             let reply = String.fromCharCode(65 + parseInt(this.answer))
-            let isCorrect = reply == this.qCorrect ? 1 : 0
-
+            let isCorrect = reply == this.qCorrect ? 1 : 2
+            
             this.$axios
                 .post(this.$baseUrl.submitQuestion, {
                     qid: this.totalQ[this.curQNo].id,
@@ -159,21 +182,17 @@ export default {
                         this.correctNum = res.data.correctNum
                         this.score = res.data.correctScore
                         this.errorQuestion = res.data.questionInfo || []
+                        this.errorNum = res.data.errorNum
                         console.log(this.errorQuestion)
                     }
                 })
 
-            if (isCorrect) {
+            if (isCorrect == 1) {
                 this.$refs.li[this.answer].classList = 'cur'
-                this.$refs.process_bar.children[
-                    this.curQNo
-                ].style.backgroundColor = '#009b96'
+                this.$refs.process_bar.children[this.curQNo].style.backgroundColor = '#009b96'
             } else {
-                this.errorNum += 1
                 this.$refs.li[this.answer].classList = 'err'
-                this.$refs.process_bar.children[
-                    this.curQNo
-                ].style.backgroundColor = '#fd7572'
+                this.$refs.process_bar.children[this.curQNo].style.backgroundColor = '#fd7572'
             }
         },
         analyze() {
@@ -215,7 +234,7 @@ export default {
             pointer-events: none;
         }
         .qContent {
-            height: 92vw;
+            height: 56vh;
             overflow-x: scroll;
             margin-bottom: 4vw;
             .topic {
@@ -255,15 +274,22 @@ export default {
                 }
             }
         }
-        .submit {
+        .btn {
+            position: absolute;
+            text-align: center;
+            left: 0;
+            bottom: 4vw;
             width: 100%;
-            height: 10vw;
-            line-height: 10vw;
-            border-radius: 10vw;
-            font-size: 4.8vw;
-            background-color: var(--yellow);
-            font-weight: 600;
-            color: #fff;
+            button {
+                width: 87vw;
+                height: 10vw;
+                line-height: 10vw;
+                border-radius: 10vw;
+                font-size: 4.8vw;
+                background-color: var(--yellow);
+                font-weight: 600;
+                color: #fff;
+            }
         }
         .complete {
             text-align: center;
