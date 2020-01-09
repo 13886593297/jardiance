@@ -4,7 +4,7 @@
         <div class="header">
             <div class="header-arrow">
                 <img src="../assets/img/details/back.png" @click="back" alt />
-                <h4 v-if="categoryId < 3">SECTION{{id}}</h4>
+                <h4 v-if="categoryId < 3">SECTION{{sort}}</h4>
                 <h4 v-else class="small">欧唐静产品介绍应用习题</h4>
                 <img src="../assets/img/details/next.png" @click="next" alt />
             </div>
@@ -47,7 +47,8 @@ export default {
             uuid: '',
             showTip: false,
             nextArticleId: null,
-            trainStatus: null
+            trainStatus: null,
+            sort: null,
         }
     },
     created() {
@@ -59,6 +60,7 @@ export default {
                 // console.log(articleList.data[0][0])
                 this.uuid = read.data.uuid
                 this.name = articleList.data[0][0].name
+                this.sort = articleList.data[0][0].sort
                 this.nextArticleId = articleList.data[0][0].nextArticleId
                 this.trainStatus = articleList.data[0][0].trainStatus
                 this.pdf = pdf.createLoadingTask({ url: articleList.data[0][0].pdf, CMapReaderFactory })
@@ -105,6 +107,7 @@ export default {
                 }).then(res => {
                     console.log(res.data[0][0])
                     this.id = res.data[0][0].id
+                    this.sort = res.data[0][0].sort
                     this.name = res.data[0][0].name
                     this.nextArticleId = res.data[0][0].nextArticleId
                     this.trainStatus = res.data[0][0].trainStatus
@@ -137,6 +140,7 @@ export default {
                 name: 'completeStudy',
                 query: {
                     id: this.id,
+                    sort: this.sort,
                     name: this.name,
                     status: this.trainStatus,
                     categoryId: this.categoryId

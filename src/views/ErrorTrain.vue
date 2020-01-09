@@ -71,7 +71,8 @@ export default {
             errorNum: 0,
             show: true,
             score: 0,
-            correctNum: 0 // 正确题数
+            correctNum: 0, // 正确题数
+            len: 0
         }
     },
     mounted() {
@@ -82,8 +83,8 @@ export default {
                 month: this.$route.query.month
             })
             .then(res => {
+                console.log(res)
                 this.totalQ = res.data.data
-                this.subText = this.totalQ.length > 1 ? '下一题' : '提交'
                 this.curQNo = this.totalQ.findIndex(
                     item => item.reply == 'null'
                 )
@@ -92,8 +93,11 @@ export default {
                     this.totalQ.forEach((item, i) => {
                         if (item.reply != 'null') {
                             this.$refs.process_bar.children[i].style.backgroundColor = item.is_correct ? '#009b96' : '#fd7572'
+                        } else {
+                            this.len++
                         }
                     })
+                    this.subText = this.len > 1 ? '下一题' : '提交'
                 })
                 this.init()
             })
@@ -157,14 +161,14 @@ export default {
                 console.log(res)
                 this.score = res.data.successScore
                 this.correctNum = res.data.successNum
+                this.errorNum = res.data.errorNum || 0
             })
 
-            if (isCorrect) {
+            if (isCorrect == 1) {
                 this.$refs.li[this.answer].classList = 'cur'
                 this.$refs.process_bar.children[this.curQNo].style.backgroundColor = '#009b96'
                 
             } else {
-                this.errorNum += 1
                 this.$refs.li[this.answer].classList = 'err'
                 this.$refs.process_bar.children[this.curQNo].style.backgroundColor = '#fd7572'
             }

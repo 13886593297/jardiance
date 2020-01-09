@@ -79,6 +79,7 @@ export default {
         }
     },
     created() {
+        console.log(this.id)
         this.setInterceptor(false)
         if (this.categoryId > 2) {
             document.title = '医讯速递'
@@ -91,7 +92,6 @@ export default {
                 if (res.status == 200) {
                     console.log(res)
                     this.totalQ = res.data
-                    console.log(this.totalQ)
                     this.$refs.process_bar.style.gridTemplateColumns = `repeat(${this.totalQ.length}, 1fr)`
                     this.$nextTick(() => {
                         this.totalQ.forEach((item, i) => {
@@ -182,7 +182,7 @@ export default {
                         this.correctNum = res.data.correctNum
                         this.score = res.data.correctScore
                         this.errorQuestion = res.data.questionInfo || []
-                        this.errorNum = res.data.errorNum
+                        this.errorNum = res.data.errorNum || 0
                         console.log(this.errorQuestion)
                     }
                 })
