@@ -11,17 +11,19 @@
             <p class="header-title">{{name}}</p>
             <img class="ball" src="../assets/img/details/ball.png" alt />
         </div>
-        <div class="content">
-            <pdf
-                :src="pdf"
-                :page="currentPage"
-                @num-pages="pageCount = $event"
-                @page-loaded="pageLoaded($event)"
-                @loaded="loadPdfHandler"
-            ></pdf>
+        <div class="content" >
+            <div ref="pdf">
+                <pdf
+                    :src="pdf"
+                    :page="currentPage"
+                    @num-pages="pageCount = $event"
+                    @page-loaded="pageLoaded($event)"
+                    @loaded="loadPdfHandler"
+                ></pdf>
+            </div>
             <div class="slip">
-                <div @click="changePdfPage(0)"></div>
-                <div @click="changePdfPage(1)"></div>
+                <button @click="changePdfPage(0)">上一页</button>
+                <button @click="changePdfPage(1)">下一页</button>
             </div>
         </div>
     </div>
@@ -29,6 +31,7 @@
 
 <script>
 import pdf from 'vue-pdf'
+import Panzoom from '@panzoom/panzoom'
 import CMapReaderFactory from 'vue-pdf/src/CMapReaderFactory.js'
 import Tip from '../components/Tip'
 export default {
@@ -75,7 +78,11 @@ export default {
     },
     methods: {
         back() {
-            this.$router.back()
+            if (window.history.length  == 1) {
+                this.$router.replace({name: 'index'})
+            } else {
+                this.$router.back()
+            }
         },
         startReadArticle() {
             return this.$axios.post(this.$baseUrl.startReadArticle, {
@@ -149,6 +156,7 @@ export default {
         },
         // pdf加载时
         loadPdfHandler(e) {
+            Panzoom(this.$refs.pdf, {minScale: 1})
             this.currentPage = 1 // 加载的时候先加载第一页
         }
     }
@@ -203,12 +211,19 @@ export default {
         box-sizing: border-box;
         .slip {
             position: absolute;
-            height: 100%;
+            bottom: 4vw;
             width: 100%;
-            top: 0;
-            left: 0;
             display: grid;
             grid-template-columns: repeat(2, 50%);
+            justify-items: center;
+            button {
+                width: 26vw;
+                height: 8vw;
+                border-radius: 10vw;
+                background-color: var(--cyan);
+                opacity: .5;
+                color: #fff;
+            }
         }
     }
 }

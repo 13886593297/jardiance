@@ -37,7 +37,7 @@
                             <br />
                             <span>积分{{item.score || 0}}</span>
                         </p>
-                        <p class="rank">TOP{{item.serialNo || key + 1}}</p>
+                        <p class="rank">TOP{{key + 1}}</p>
                     </div>
                 </li>
             </ul>

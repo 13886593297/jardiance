@@ -67,15 +67,16 @@ export default {
             options: [], // 题目选项
             answer: '', // 玩家选择的答案
             qCorrect: '', // 正确答案
-            subText: '',
-            isEnd: false,
-            show: true,
+            subText: '', // 按钮文字
+            isEnd: false, // 是否答题结束
+            show: true,  // 是否显示答题按钮
             correctNum: 0, // 正确题数
             score: 0, // 获得积分
             errorNum: 0, // 错误题数
-            errorQuestion: [],
-            showTip: false,
-            len: 0
+            errorQuestion: [], // 错题信息
+            showTip: false, // 显示提示
+            len: 0, // 还未答题的数量
+            timer: null // 每题答完后设置计时器禁止点击
         }
     },
     created() {
@@ -114,6 +115,7 @@ export default {
     },
     beforeDestroy() {
         this.setInterceptor(true)
+        clearTimeout(this.timer)
     },
     methods: {
         ...mapMutations(['setInterceptor']),
@@ -152,7 +154,7 @@ export default {
             }
             this.$refs.question.classList.add('disabled')
 
-            setTimeout(() => {
+            this.timer = setTimeout(() => {
                 if (this.curQNo < this.totalQ.length - 1) {
                     this.curQNo += 1
                     this.init()

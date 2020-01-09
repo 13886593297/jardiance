@@ -89,7 +89,11 @@ export default {
                 })
         },
         back() {
-            this.$router.back()
+            if (window.history.length  == 1) {
+                this.$router.replace({name: 'index'})
+            } else {
+                this.$router.back()
+            }
         }
     }
 }

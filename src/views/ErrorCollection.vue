@@ -1,10 +1,7 @@
 <template>
     <div class="collection">
         <p class="title">错题月考</p>
-        <div
-            @click="toErrorTrain"
-            :class="['section', {pass: failQuestionInfo.status > 1}]"
-        >
+        <div @click="toErrorTrain" :class="['section', {pass: failQuestionInfo.status > 1}]">
             <p class="month">Month {{failQuestionInfo.month}}</p>
             <p class="section_name">
                 {{failQuestionInfo.name}}
@@ -14,25 +11,27 @@
         <div class="allErrQ">
             <p class="title">所有错题</p>
             <ul v-if="!noQues">
-                <li
-                    v-for="(item, key) in allErrQ"
-                    :key="key"
-                    :class="{fall: item.trainStatus == 2 && item.arttcleTime.status == 200, continue: item.trainStatus == 2 && item.arttcleTime.status == 201}"
-                    @click="getArticleErrorQuestion(item.name, item.id, item.trainStatus, item.category_id)"
-                >
-                    <div class="circle"></div>
-                    <div class="time">{{item.submit_time | timeformat}}</div>
-                    <div class="name">{{item.name}}</div>
-                    <div class="status" v-if="item.trainStatus == 1">PASS</div>
-                    <div
-                        class="status"
-                        v-if="item.trainStatus == 2 && item.arttcleTime.status == 200"
-                    >FAIL</div>
-                    <div
-                        class="status"
-                        v-if="item.trainStatus == 2 && item.arttcleTime.status == 201"
-                    >{{item.arttcleTime.formatTime}}</div>
-                </li>
+                <template v-for="(item, key) in allErrQ">
+                    <li
+                        v-if="item.trainStatus != 0"
+                        :key="key"
+                        :class="{fail: item.trainStatus == 2 && item.arttcleTime.status == 200, continue: item.trainStatus == 2 && item.arttcleTime.status == 201}"
+                        @click="getArticleErrorQuestion(item.name, item.id, item.trainStatus, item.category_id)"
+                    >
+                        <div class="circle"></div>
+                        <div class="time">{{item.submit_time | timeformat}}</div>
+                        <div class="name">{{item.name}}</div>
+                        <div class="status" v-if="item.trainStatus == 1">PASS</div>
+                        <div
+                            class="status"
+                            v-if="item.trainStatus == 2 && item.arttcleTime.status == 200"
+                        >FAIL</div>
+                        <div
+                            class="status"
+                            v-if="item.trainStatus == 2 && item.arttcleTime.status == 201"
+                        >{{item.arttcleTime.formatTime}}</div>
+                    </li>
+                </template>
             </ul>
             <div class="noQues" v-else>
                 <img src="../assets/img/error/1.jpg" alt />
@@ -55,20 +54,29 @@
                     </span>
                     <br />加油！
                 </div>
-                <img class="colse" src="../assets/img/details/close.png" @click="showTip = false" alt />
+                <img
+                    class="colse"
+                    src="../assets/img/details/close.png"
+                    @click="showTip = false"
+                    alt
+                />
             </div>
         </div>
         <div class="tip emptyQ" v-show="emptyQ">
             <div>
                 <img class="pic" src="../assets/img/error/3.jpg" alt />
                 <div>
-                    <p>哦！题库空空！</p>
-                    您还没有答错的题目哦！
+                    <p>哦！题库空空！</p>您还没有答错的题目哦！
                     <br />
                     <span>快去答题吧</span>
                     <br />加油！
                 </div>
-                <img class="colse" src="../assets/img/details/close.png" @click="emptyQ = false" alt />
+                <img
+                    class="colse"
+                    src="../assets/img/details/close.png"
+                    @click="emptyQ = false"
+                    alt
+                />
             </div>
         </div>
     </div>
@@ -117,7 +125,10 @@ export default {
             article.data.forEach(item => {
                 if (item.trainStatus == 2 && item.arttcleTime.status == 200) {
                     item._status = 3
-                } else if (item.trainStatus == 2 && item.arttcleTime.status == 201) {
+                } else if (
+                    item.trainStatus == 2 &&
+                    item.arttcleTime.status == 201
+                ) {
                     item._status = 2
                 } else if (item.trainStatus == 1) {
                     item._status = 1
@@ -149,7 +160,7 @@ export default {
                         } else {
                             item.arttcleTime.status = 200
                         }
-                    }, 1000);
+                    }, 1000)
                 }
                 this.allErrQ.push(item)
             })
@@ -279,7 +290,7 @@ export default {
                     justify-self: end;
                     color: #009d92;
                 }
-                &.fall {
+                &.fail {
                     .circle {
                         border-color: #f6c939;
                     }

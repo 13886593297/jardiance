@@ -21,7 +21,7 @@ export default {
             ani: false, // 开始动画
             backAni: false, // 回来的动画
             whirl: false, // 转圈动画
-            isdisabled: false
+            isdisabled: false // 上一次搜索还未返回数据时阻止点击
         }
     },
     props: ['name', 'id'],
