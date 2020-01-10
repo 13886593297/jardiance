@@ -43,6 +43,7 @@ export default {
                 hash = window.sessionStorage.getItem('hash')
                 if (hash) {
                     window.location = window.location.origin + window.location.pathname + hash
+                    window.sessionStorage.removeItem('hash')
                 }
             } else {
                 alert('无权限访问')

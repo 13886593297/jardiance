@@ -10,8 +10,15 @@
             </div>
             <p class="header-title">{{name}}</p>
             <img class="ball" src="../assets/img/details/ball.png" alt />
+            <div class="btn">
+                <div></div>
+                <div @click="changePdfPage(0)"></div>
+                <div></div>
+                <div @click="changePdfPage(1)"></div>
+                <div></div>
+            </div>
         </div>
-        <div class="content" >
+        <div class="content">
             <div ref="pdf">
                 <pdf
                     :src="pdf"
@@ -21,10 +28,10 @@
                     @loaded="loadPdfHandler"
                 ></pdf>
             </div>
-            <div class="slip">
-                <button @click="changePdfPage(0)">上一页</button>
-                <button @click="changePdfPage(1)">下一页</button>
-            </div>
+        </div>
+        <div class="zoomTip">
+            <img src="../assets/img/details/hand.png" alt="">
+            <p>阅读内容可点击放大</p>
         </div>
     </div>
 </template>
@@ -52,35 +59,20 @@ export default {
             nextArticleId: null,
             trainStatus: null,
             sort: null,
-            type: ''
+            type: '',
         }
     },
     created() {
         this.$axios.all([this.startReadArticle(), this.getArticleByArticleId()]).then(
             this.$axios.spread((read, articleList) => {
-                console.log(articleList)
                 this.uuid = read.data.uuid
-                if (typeof articleList.data == 'string') {
-                    window.location.href = articleList.data
-                } else if (articleList.data.userCode == 2) {
-                    this.userInfo = articleList.data.reUserInfo
-                    window.sessionStorage.setItem('user', JSON.stringify(articleList.data.reUserInfo))
-                    let processWidth = this.userInfo.totalTrain / this.userInfo.totalQuestion
-                    this.$refs.process.style.width = Math.floor(processWidth * 100) + '%'
-                } else if (articleList.data[0][0].sort) {
-                    this.name = articleList.data[0][0].name
-                    this.sort = articleList.data[0][0].sort
-                    this.type = articleList.data[0][0].type
-                    this.nextArticleId = articleList.data[0][0].nextArticleId
-                    this.trainStatus = articleList.data[0][0].trainStatus
-                    this.pdf = pdf.createLoadingTask({ url: articleList.data[0][0].pdf, CMapReaderFactory })
-                    document.title = this.type
-                } else {
-                    alert('无权限访问')
-                    setTimeout(() => {
-                        WeixinJSBridge.call('closeWindow')
-                    }, 100)
-                }
+                this.name = articleList.data[0][0].name
+                this.sort = articleList.data[0][0].sort
+                this.type = articleList.data[0][0].type
+                this.nextArticleId = articleList.data[0][0].nextArticleId
+                this.trainStatus = articleList.data[0][0].trainStatus
+                this.pdf = pdf.createLoadingTask({ url: articleList.data[0][0].pdf, CMapReaderFactory })
+                document.title = this.type
             })
         )
     },
@@ -146,10 +138,6 @@ export default {
             if (val === 0 && this.currentPage > 1) {
                 this.currentPage--
             } else if (val === 1) {
-                if (process.env.NODE_ENV == "development") {
-                        this.changeRoute()
-                    return
-                }
                 if (this.currentPage < this.pageCount) {
                     this.currentPage++
                 } else {
@@ -184,6 +172,7 @@ export default {
         height: 30vw;
         display: grid;
         grid-template-rows: 12vw auto;
+        position: relative;
         .header-arrow {
             display: grid;
             grid-template-columns: 15% auto 15%;
@@ -210,11 +199,25 @@ export default {
         }
         .ball {
             position: absolute;
-            width: 14.6vw;
+            width: 47vw;
             left: 50%;
             transform: translateX(-50%);
             top: 23vw;
             z-index: 1;
+        }
+        .btn {
+            position: absolute;
+            bottom: -5vw;
+            width: 100%;
+            height: 9vw;
+            display: grid;
+            grid-template-columns: 26% 17% 14% 17% 26%;
+            justify-items: center;
+            z-index: 1;
+            div {
+                width: 100%;
+                height: 100%;
+            }
         }
     }
     .content {
@@ -224,22 +227,33 @@ export default {
         position: relative;
         padding-top: 10vw;
         box-sizing: border-box;
-        .slip {
-            position: absolute;
-            bottom: 4vw;
-            width: 100%;
-            display: grid;
-            grid-template-columns: repeat(2, 50%);
-            justify-items: center;
-            button {
-                width: 26vw;
-                height: 8vw;
-                border-radius: 10vw;
-                background-color: var(--cyan);
-                opacity: .5;
-                color: #fff;
-            }
+    }
+    .zoomTip {
+        position: absolute;
+        width: 44.6vw;
+        height: 20.4vw;
+        background-color: rgba($color: #000000, $alpha: .7);
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        color: #fff;
+        border-radius: 3vw;
+        font-size: 3.5vw;
+        animation: fadeOut 3s .5s forwards;
+        img {
+            width: 11.3vw;
+            margin-top: 1vw;
         }
+    }
+}
+
+@keyframes fadeOut {
+    0% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
     }
 }
 </style>

@@ -67,21 +67,18 @@ export default {
     name: 'index',
     data() {
         return {
-            userInfo: JSON.parse(window.sessionStorage.getItem('user')),
-            default_avatar: require('../assets/img/rank/default_avatar.png'),
+            userInfo: {},
         }
     },
     created() {
         this.$axios.get(this.$baseUrl.userInfo).then(res => {
             if (res.data.userCode == 2) {
                 this.userInfo = res.data.reUserInfo
+                let processWidth = this.userInfo.totalTrain / this.userInfo.totalQuestion
+                this.$refs.process.style.width = Math.floor(processWidth * 100) + '%'
                 window.sessionStorage.setItem('user', JSON.stringify(res.data.reUserInfo))
             }
         })
-    },
-    mounted() {
-        let processWidth = this.userInfo.totalTrain / this.userInfo.totalQuestion
-        this.$refs.process.style.width = Math.floor(processWidth * 100) + '%'
     },
     methods: {
         toTrainIndex() {
