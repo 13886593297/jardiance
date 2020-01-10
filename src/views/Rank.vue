@@ -35,7 +35,7 @@
                         <p class="name">
                             {{item.name}}
                             <br />
-                            <span>积分{{item.score || 0}}</span>
+                            <span>{{active == 0 ? '积分' : '平均积分'}}{{item.score || 0}}</span>
                         </p>
                         <p class="rank">TOP{{key + 1}}</p>
                     </div>
@@ -59,7 +59,7 @@ export default {
             avatar: this.$handler.getStorage('avatar'),
             user_rank: this.$handler.getStorage('personalRank'),
             user_score: this.$handler.getStorage('totalScore'),
-            group: ['SR', 'DM', 'RSD', 'RMM'],
+            group: ['REP', 'DM', 'RSD', 'RMM'],
             apiArr: ['personalRank', 'teamRank?name=DM', 'teamRank?name=RSD', 'teamRank?name=RMM'],
             active: 0,
             rank: []
@@ -83,6 +83,7 @@ export default {
             this.$axios
                 .get('/api/rank/' + this.apiArr[this.active])
                 .then(res => {
+                    console.log(res)
                     this.rank = res.data
                 })
         },

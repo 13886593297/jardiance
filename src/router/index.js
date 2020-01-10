@@ -18,7 +18,7 @@ const routes = [
                 /* webpackChunkName: "trainIndex" */ '../views/TrainIndex.vue'
             ),
         meta: {
-            title: '基础培训'
+            title: '基础训练'
         }
     },
     {
@@ -27,17 +27,14 @@ const routes = [
         component: () =>
             import(/* webpackChunkName: "section" */ '../views/Section.vue'),
         meta: {
-            title: '基础培训'
+            title: '基础训练'
         }
     },
     {
         path: '/details',
         name: 'details',
         component: () =>
-            import(/* webpackChunkName: "details" */ '../views/Details.vue'),
-        meta: {
-            title: '基础培训'
-        }
+            import(/* webpackChunkName: "details" */ '../views/Details.vue')
     },
     {
         path: '/completeStudy',
@@ -45,10 +42,7 @@ const routes = [
         component: () =>
             import(
                 /* webpackChunkName: "completeStudy" */ '../views/CompleteStudy.vue'
-            ),
-        meta: {
-            title: '基础培训'
-        }
+            )
     },
     {
         path: '/train',
@@ -56,7 +50,7 @@ const routes = [
         component: () =>
             import(/* webpackChunkName: "train" */ '../views/Train.vue'),
         meta: {
-            title: '基础培训'
+            title: '基础训练'
         }
     },
     {

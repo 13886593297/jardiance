@@ -4,7 +4,7 @@
         <div class="header">
             <div class="header-arrow">
                 <img src="../assets/img/details/back.png" @click="back" alt />
-                <h4 v-if="categoryId < 3">SECTION{{sort}}</h4>
+                <h4 v-if="type == '基础训练'">SECTION{{sort}}</h4>
                 <h4 v-else class="small">欧唐静产品介绍应用习题</h4>
                 <img src="../assets/img/details/next.png" @click="next" alt />
             </div>
@@ -52,21 +52,35 @@ export default {
             nextArticleId: null,
             trainStatus: null,
             sort: null,
+            type: ''
         }
     },
     created() {
-        if (this.categoryId > 2) {
-            document.title = '医讯速递'
-        }
         this.$axios.all([this.startReadArticle(), this.getArticleByArticleId()]).then(
             this.$axios.spread((read, articleList) => {
-                // console.log(articleList.data[0][0])
+                console.log(articleList)
                 this.uuid = read.data.uuid
-                this.name = articleList.data[0][0].name
-                this.sort = articleList.data[0][0].sort
-                this.nextArticleId = articleList.data[0][0].nextArticleId
-                this.trainStatus = articleList.data[0][0].trainStatus
-                this.pdf = pdf.createLoadingTask({ url: articleList.data[0][0].pdf, CMapReaderFactory })
+                if (typeof articleList.data == 'string') {
+                    window.location.href = articleList.data
+                } else if (articleList.data.userCode == 2) {
+                    this.userInfo = articleList.data.reUserInfo
+                    window.sessionStorage.setItem('user', JSON.stringify(articleList.data.reUserInfo))
+                    let processWidth = this.userInfo.totalTrain / this.userInfo.totalQuestion
+                    this.$refs.process.style.width = Math.floor(processWidth * 100) + '%'
+                } else if (articleList.data[0][0].sort) {
+                    this.name = articleList.data[0][0].name
+                    this.sort = articleList.data[0][0].sort
+                    this.type = articleList.data[0][0].type
+                    this.nextArticleId = articleList.data[0][0].nextArticleId
+                    this.trainStatus = articleList.data[0][0].trainStatus
+                    this.pdf = pdf.createLoadingTask({ url: articleList.data[0][0].pdf, CMapReaderFactory })
+                    document.title = this.type
+                } else {
+                    alert('无权限访问')
+                    setTimeout(() => {
+                        WeixinJSBridge.call('closeWindow')
+                    }, 100)
+                }
             })
         )
     },
@@ -94,7 +108,8 @@ export default {
             return this.$axios.get(this.$baseUrl.getArticleByArticleId, {
                 params: {
                     articleId: this.id,
-                    categoryId: this.categoryId
+                    categoryId: this.categoryId,
+                    url: window.location.href
                 }
             })
         },
@@ -150,7 +165,7 @@ export default {
                     sort: this.sort,
                     name: this.name,
                     status: this.trainStatus,
-                    categoryId: this.categoryId
+                    type: this.type
                 }
             })    
         },

@@ -60,7 +60,7 @@ export default {
         return {
             id: this.$route.params.id,
             name: this.$route.params.name,
-            categoryId: this.$route.params.categoryId,
+            type: this.$route.params.type,
             curQNo: 0, // 当前第几道题
             totalQ: [], // 全部题目
             topic: '', // 题目
@@ -80,11 +80,8 @@ export default {
         }
     },
     created() {
-        console.log(this.id)
         this.setInterceptor(false)
-        if (this.categoryId > 2) {
-            document.title = '医讯速递'
-        }
+        document.title = this.type
         this.$axios
             .post(this.$baseUrl.trainStart, {
                 article_id: this.id

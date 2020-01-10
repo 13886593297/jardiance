@@ -2,10 +2,10 @@
     <div class="index">
         <div class="userInfo">
             <div class="userInfo-top">
-                <img :src="userInfo.avatar || default_avatar" alt />
+                <img :src="userInfo.avatar" alt />
                 <div>
                     <p class="small">WELCOME</p>
-                    <p>{{ userInfo.name || '小静' }}</p>
+                    <p>{{ userInfo.name }}</p>
                 </div>
             </div>
             <div class="userInfo-bottom">
@@ -30,7 +30,7 @@
                     <p>基础训练</p>
                     <p>Basic Training</p>
                 </div>
-                <div>{{ userInfo.totalTrain || 0 }}/{{ userInfo.totalQuestion || 1 }}</div>
+                <div>{{ userInfo.totalTrain }}/{{ userInfo.totalQuestion }}</div>
             </div>
             <div class="process-bar">
                 <div class="process-bar-area" ref="process"></div>
@@ -67,36 +67,21 @@ export default {
     name: 'index',
     data() {
         return {
-            userInfo: {},
+            userInfo: JSON.parse(window.sessionStorage.getItem('user')),
             default_avatar: require('../assets/img/rank/default_avatar.png'),
         }
     },
     created() {
-        let hash = window.location.hash
-        console.log(window.location)
-        if (hash != '#/') {
-            window.sessionStorage.setItem('hash', hash)
-        }
-        // userCode 2 正常 1 没有这个用户
         this.$axios.get(this.$baseUrl.userInfo).then(res => {
-            if (typeof res.data == 'string') {
-                window.location.href = res.data
-            } else if (res.data.userCode == 2) {
+            if (res.data.userCode == 2) {
                 this.userInfo = res.data.reUserInfo
                 window.sessionStorage.setItem('user', JSON.stringify(res.data.reUserInfo))
-                let processWidth = this.userInfo.totalTrain / this.userInfo.totalQuestion
-                this.$refs.process.style.width = Math.floor(processWidth * 100) + '%'
-                hash = window.sessionStorage.getItem('hash')
-                if (hash) {
-                    window.location = window.location.origin + window.location.pathname + hash
-                }
-            } else {
-                alert('无权限访问')
-                setTimeout(() => {
-                    WeixinJSBridge.call('closeWindow')
-                }, 100)
             }
         })
+    },
+    mounted() {
+        let processWidth = this.userInfo.totalTrain / this.userInfo.totalQuestion
+        this.$refs.process.style.width = Math.floor(processWidth * 100) + '%'
     },
     methods: {
         toTrainIndex() {

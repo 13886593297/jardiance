@@ -1,7 +1,7 @@
 <template>
     <div class="complete">
         <img class="pic" src="../assets/img/details/complete.png" alt />
-        <p class="num" v-if="categoryId < 3">恭喜您完成第{{sort}}章节的学习</p>
+        <p class="num" v-if="type == '基础训练'">恭喜您完成第{{sort}}章节的学习</p>
         <p class="num" v-else>恭喜您完成本章节的学习</p>
         <button class="testStart" @click="trainStart">开始测试</button>
         <p class="tip">请点击按钮进行测试</p>
@@ -31,19 +31,17 @@
 export default {
     data() {
         return {
-            id: this.$route.query.id,
+            type: this.$route.query.type,
             sort: this.$route.query.sort,
             name: this.$route.query.name,
             status: this.$route.query.status,
-            categoryId: this.$route.query.categoryId,
+            id: this.$route.query.id,
             refuse: false,
             time: ''
         }
     },
     created() {
-        if (this.categoryId > 2) {
-            document.title = '医讯速递'
-        }
+        document.title = this.type
     },
     methods: {
         trainStart() {
@@ -62,7 +60,7 @@ export default {
                             params: {
                                 id: this.id,
                                 name: this.name,
-                                categoryId: this.categoryId
+                                type: this.type
                             }
                         })
                     } else {
