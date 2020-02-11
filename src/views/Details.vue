@@ -29,16 +29,16 @@
                 ></pdf>
             </div>
         </div>
-        <div class="zoomTip">
+        <!-- <div class="zoomTip">
             <img src="../assets/img/details/hand.png" alt="">
             <p>阅读内容可点击放大</p>
-        </div>
+        </div> -->
     </div>
 </template>
 
 <script>
 import pdf from 'vue-pdf'
-import Panzoom from '@panzoom/panzoom'
+// import Panzoom from '@panzoom/panzoom'
 import CMapReaderFactory from 'vue-pdf/src/CMapReaderFactory.js'
 import Tip from '../components/Tip'
 export default {
@@ -159,7 +159,7 @@ export default {
         },
         // pdf加载时
         loadPdfHandler(e) {
-            Panzoom(this.$refs.pdf, {minScale: 1})
+            // Panzoom(this.$refs.pdf, {minScale: 1})
             this.currentPage = 1 // 加载的时候先加载第一页
         }
     }
