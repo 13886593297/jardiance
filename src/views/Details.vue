@@ -28,6 +28,7 @@
                     @loaded="loadPdfHandler"
                 ></pdf>
             </div>
+            <!-- <div class="pdf"></div> -->
         </div>
         <!-- <div class="zoomTip">
             <img src="../assets/img/details/hand.png" alt="">
@@ -37,6 +38,7 @@
 </template>
 
 <script>
+// import Pdfh5 from "pdfh5"
 import pdf from 'vue-pdf'
 // import Panzoom from '@panzoom/panzoom'
 import CMapReaderFactory from 'vue-pdf/src/CMapReaderFactory.js'
@@ -60,6 +62,11 @@ export default {
             trainStatus: null,
             sort: null,
             type: '',
+            distance: {},
+            origin: null,
+            scale: 1,
+            isCanScale: false
+            // pdfh5: null
         }
     },
     created() {
@@ -73,6 +80,16 @@ export default {
                 this.trainStatus = articleList.data[0][0].trainStatus
                 this.pdf = pdf.createLoadingTask({ url: articleList.data[0][0].pdf, CMapReaderFactory })
                 document.title = this.type
+                // this.pdfh5 = new Pdfh5('.pdf', {
+                //     pdfurl: articleList.data[0][0].pdf
+                // })
+                // this.pdfh5.on('render', function(currentNum) {
+                //     console.log(currentNum)
+                // })
+                this.$refs.pdf.addEventListener('touchstart', this.handleTouch)
+                this.$refs.pdf.addEventListener('touchmove', this.handleTouch)
+                this.$refs.pdf.addEventListener('touchend', this.handleTouch)
+                this.$refs.pdf.addEventListener('touchcancel', this.handleTouch)
             })
         )
     },
@@ -161,6 +178,77 @@ export default {
         loadPdfHandler(e) {
             // Panzoom(this.$refs.pdf, {minScale: 1})
             this.currentPage = 1 // 加载的时候先加载第一页
+        },
+        handleTouch(e) {
+            e.preventDefault()
+            switch(e.type) {
+                case 'touchstart':
+                    if (e.touches.length > 1) {
+                        this.distance.start = this.getDistance({
+                            x: e.touches[0].screenX,
+                            y: e.touches[0].screenY
+                        }, {
+                            x: e.touches[1].screenX,
+                            y: e.touches[1].screenY
+                        })
+                    }
+                    break
+                case 'touchmove':
+                    if (e.touches.length == 2) {
+                        this.origin = this.getOrigin({
+                            x: event.touches[0].pageX,
+                            y: event.touches[0].pageY
+                        }, {
+                            x: event.touches[1].pageX,
+                            y: event.touches[1].pageY
+                        })
+                        this.distance.stop = this.getDistance({
+                            x: e.touches[0].screenX,
+                            y: e.touches[0].screenY
+                        }, {
+                            x: e.touches[1].screenX,
+                            y: e.touches[1].screenY
+                        })
+                        this.scale = this.distance.stop / this.distance.start
+                        this.isCanScale = true
+                        this.setScaleAnimation(this.scale, true)
+                    }
+                    break
+                case 'touchend':
+                    this.scale = 1
+                    this.setScaleAnimation(this.scale)
+                    break
+                case 'touchcancel':
+                    this.scale = 1
+                    this.setScaleAnimation(this.scale)
+                    break
+            }
+        },
+        getDistance(start, stop) {
+            return Math.sqrt(Math.pow((stop.x - start.x), 2) + Math.pow(stop.y - start.y), 2)
+        },
+        getOrigin(first, second) {
+            return {
+                x: (first.x + second.x) / 2,
+                y: (first.y + second.y) / 2
+            }
+        },
+        setScaleAnimation(scale, animation) {
+            let transition_animation = ''
+            let x, y
+            if (!this.isCanScale) {
+                return
+            }
+            this.isCanScale = false
+            if (animation) {
+                transition_animation = 'none'
+            } else {
+                transition_animation = '0.3s ease-out'
+            }
+            this.$refs.pdf.style.transition = transition_animation
+            x = this.origin.x + (-this.origin.x) * this.scale
+            y = this.origin.y + (-this.origin.y) * this.scale
+            this.$refs.pdf.style.transform = 'matrix(' + this.scale + ', 0, 0' + this.scale + ', ' + x + ', ' + y + ')'
         }
     }
 }
