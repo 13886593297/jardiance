@@ -49,12 +49,9 @@
     </div>
 </template>
 <script>
-import store from '../store'
-import { mapMutations } from 'vuex'
 import TrainHeader from '../components/TrainHeader'
 import Tip from '../components/Tip'
 export default {
-    store,
     components: { TrainHeader, Tip },
     data() {
         return {
@@ -80,7 +77,6 @@ export default {
         }
     },
     created() {
-        this.setInterceptor(false)
         document.title = this.type
         this.$axios
             .post(this.$baseUrl.trainStart, {
@@ -111,11 +107,9 @@ export default {
             })
     },
     beforeDestroy() {
-        this.setInterceptor(true)
         clearTimeout(this.timer)
     },
     methods: {
-        ...mapMutations(['setInterceptor']),
         init() {
             console.log(this.totalQ)
             this.topic = this.totalQ[this.curQNo].question

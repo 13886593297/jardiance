@@ -49,10 +49,7 @@
 </template>
 
 <script>
-import store from '../store'
-import { mapMutations } from 'vuex'
 export default {
-    store,
     data() {
         return {
             default_avatar: require('../assets/img/rank/default_avatar.png'),
@@ -67,13 +64,8 @@ export default {
     },
     created() {
         this.getRank()
-        this.setInterceptor(false)
-    },
-    beforeDestroy() {
-        this.setInterceptor(true)
     },
     methods: {
-        ...mapMutations(['setInterceptor']),
         change(key) {
             if (this.active == key) return
             this.active = key

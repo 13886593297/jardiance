@@ -55,7 +55,6 @@
 
 <script>
 export default {
-    store,
     data() {
         return {
             curQNo: 0,

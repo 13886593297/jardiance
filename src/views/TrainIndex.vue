@@ -35,13 +35,10 @@
 </template>
 
 <script>
-import store from '../store'
-import { mapMutations } from 'vuex'
 import SearchHeader from '../components/SearchHeader'
 import SectionComponent from '../components/SectionComponent'
 import Tip from '../components/Tip'
 export default {
-    store,
     data() {
         return {
             dataArr: [],
@@ -59,7 +56,6 @@ export default {
         Tip
     },
     created() {
-        this.setInterceptor(false)
         this.$axios
             .post(this.$baseUrl.trainIndex, {
                 type: '基础训练'
@@ -68,11 +64,7 @@ export default {
                 this.dataArr = res.data
             })
     },
-    beforeDestroy() {
-        this.setInterceptor(true)
-    },
     methods: {
-        ...mapMutations(['setInterceptor']),
         getChildData(val) {
             this.search = true
             this.sections = []

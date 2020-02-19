@@ -7,8 +7,6 @@ import BaseUrl from './assets/js/baseUrl'
 import * as Handler from './assets/js/handler'
 import share from './assets/js/share'
 import './assets/css/base.scss'
-import Loading from 'vue-loading-overlay'
-import 'vue-loading-overlay/dist/vue-loading.css'
 
 new VConsole()
 Vue.config.productionTip = false
@@ -49,9 +47,6 @@ Vue.prototype.$axios = Axios
 Vue.prototype.$baseUrl = BaseUrl
 Vue.prototype.$handler = Handler
 Vue.prototype.$share = share
-
-// 挂载全局组件
-Vue.component('v-loading', Loading)
 
 new Vue({
     router,
