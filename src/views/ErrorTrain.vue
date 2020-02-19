@@ -73,7 +73,7 @@ export default {
         }
     },
     created() {
-        if (window.history.length == 11) {
+        if (window.history.length == 1) {
             this.$axios.post(this.$baseUrl.trainStart, {
                 article_id: 19
             }).then(res => {
