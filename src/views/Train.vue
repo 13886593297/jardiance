@@ -1,0 +1,313 @@
+<template>
+    <div class="main">
+        <train-header :id="id" :name="name" :sectionEn="true" :curQNo="curQNo" :totalQ="totalQ"></train-header>
+        <tip v-show="showTip" title="OMG！" content="哎呀，您还没有选择答案哦！"></tip>
+        <div class="process-bar" ref="process_bar">
+            <div v-for="i in totalQ.length" :key="i"></div>
+        </div>
+        <div class="question" ref="question">
+            <div class="qContent">
+                <div class="answerArea" v-show="!isEnd">
+                    <div class="topic">
+                        <span></span>
+                        <span>{{topic}}</span>
+                    </div>
+                    <ul>
+                        <li
+                            v-for="(option, index) in options"
+                            :class="{ cur: answer === index }"
+                            @click="answer = index"
+                            :key="index"
+                            ref="li"
+                        >{{option}}</li>
+                    </ul>
+                </div>
+                <div class="complete" v-show="isEnd">
+                    <div class="success" v-show="!errorNum">
+                        <img src="../assets/img/train/success.png" alt />
+                        <p>
+                            恭喜您全部答对获得
+                            <br />
+                            <span class="score">{{score}}</span>积分
+                        </p>
+                    </div>
+                    <div class="fail" v-show="errorNum">
+                        <img src="../assets/img/train/fail.png" alt />
+                        <p>
+                            正确{{correctNum}}道，获得{{score}}积分，错误题数
+                            <span class="score">{{errorNum}}</span>题，
+                        </p>
+                        <p>详见题目分析，您可在三天后重新答题。</p>
+                    </div>
+                </div>
+            </div>
+            <div class="btn">
+                <button class="submit" @click="submit" v-if="show">{{subText}}</button>
+                <button class="submit" @click="analyze" v-if="isEnd">{{ errorNum == 0 ? '返回目录' : '题目分析' }}</button>
+            </div>
+        </div>
+    </div>
+</template>
+<script>
+import store from '../store'
+import { mapMutations } from 'vuex'
+import TrainHeader from '../components/TrainHeader'
+import Tip from '../components/Tip'
+export default {
+    store,
+    components: { TrainHeader, Tip },
+    data() {
+        return {
+            id: this.$route.params.id,
+            name: this.$route.params.name,
+            type: this.$route.params.type,
+            curQNo: 0, // 当前第几道题
+            totalQ: [], // 全部题目
+            topic: '', // 题目
+            options: [], // 题目选项
+            answer: '', // 玩家选择的答案
+            qCorrect: '', // 正确答案
+            subText: '', // 按钮文字
+            isEnd: false, // 是否答题结束
+            show: true,  // 是否显示答题按钮
+            correctNum: 0, // 正确题数
+            score: 0, // 获得积分
+            errorNum: 0, // 错误题数
+            errorQuestion: [], // 错题信息
+            showTip: false, // 显示提示
+            len: 0, // 还未答题的数量
+            timer: null // 每题答完后设置计时器禁止点击
+        }
+    },
+    created() {
+        this.setInterceptor(false)
+        document.title = this.type
+        this.$axios
+            .post(this.$baseUrl.trainStart, {
+                article_id: this.id
+            })
+            .then(res => {
+                if (res.status == 200) {
+                    console.log(res)
+                    this.totalQ = res.data
+                    this.$refs.process_bar.style.gridTemplateColumns = `repeat(${this.totalQ.length}, 1fr)`
+                    this.$nextTick(() => {
+                        this.totalQ.forEach((item, i) => {
+                            if (item.is_correct == 1) {
+                                this.$refs.process_bar.children[i].style.backgroundColor = '#009b96'
+                            } else if (item.is_correct == 2) {
+                                this.$refs.process_bar.children[i].style.backgroundColor = '#fd7572'
+                            } else {
+                                this.len++
+                            }
+                        })
+                        this.subText = this.len > 1 ? '下一题' : '提交'
+                        this.curQNo = this.totalQ.findIndex(item => {
+                            return item.is_correct == 0
+                        })
+                        this.init()
+                    })
+                }
+            })
+    },
+    beforeDestroy() {
+        this.setInterceptor(true)
+        clearTimeout(this.timer)
+    },
+    methods: {
+        ...mapMutations(['setInterceptor']),
+        init() {
+            console.log(this.totalQ)
+            this.topic = this.totalQ[this.curQNo].question
+            this.qCorrect = this.totalQ[this.curQNo].anwser_correct.trim()
+            // console.log('正确答案为', this.qCorrect)
+            // 重置选项和玩家选择的答案
+            this.options = []
+            this.answer = ''
+            // 添加每一题的选项
+            for (let key in this.totalQ[this.curQNo]) {
+                if (this.totalQ[this.curQNo][key] != '') {
+                    if (
+                        key == 'anwser_a' ||
+                        key == 'anwser_b' ||
+                        key == 'anwser_c' ||
+                        key == 'anwser_d'
+                    ) {
+                        this.options.push(this.totalQ[this.curQNo][key])
+                    }
+                }
+            }
+        },
+        submit() {
+            if (this.answer === '') {
+                this.showTip = true
+                setTimeout(() => {
+                    this.showTip = false
+                }, 2000)
+                return
+            }
+            if (this.subText == '提交') {
+                this.show = false
+            }
+            this.$refs.question.classList.add('disabled')
+
+            this.timer = setTimeout(() => {
+                if (this.curQNo < this.totalQ.length - 1) {
+                    this.curQNo += 1
+                    this.init()
+                    if (this.curQNo == this.totalQ.length - 1) {
+                        this.subText = '提交'
+                    }
+                } else {
+                    this.isEnd = true
+                }
+                this.$refs.question.classList.remove('disabled')
+            }, 2000)
+
+            // 把玩家选择的0，1，2，3转化成A，B，C，D
+            let reply = String.fromCharCode(65 + parseInt(this.answer))
+            let isCorrect = reply == this.qCorrect ? 1 : 2
+            
+            this.$axios
+                .post(this.$baseUrl.submitQuestion, {
+                    qid: this.totalQ[this.curQNo].id,
+                    reply,
+                    isCorrect,
+                    articleId: this.id,
+                    isEnd: this.curQNo == this.totalQ.length - 1
+                })
+                .then(res => {
+                    if (typeof res.data == 'object') {
+                        this.correctNum = res.data.correctNum
+                        this.score = res.data.correctScore
+                        this.errorQuestion = res.data.questionInfo || []
+                        this.errorNum = res.data.errorNum || 0
+                        console.log(this.errorQuestion)
+                    }
+                })
+
+            if (isCorrect == 1) {
+                this.$refs.li[this.answer].classList = 'cur'
+                this.$refs.process_bar.children[this.curQNo].style.backgroundColor = '#009b96'
+            } else {
+                this.$refs.li[this.answer].classList = 'err'
+                this.$refs.process_bar.children[this.curQNo].style.backgroundColor = '#fd7572'
+            }
+        },
+        analyze() {
+            if (this.errorNum) {
+                this.$router.replace({
+                    name: 'analyze',
+                    params: {
+                        id: this.id,
+                        name: this.name,
+                        status: 1,
+                        errorQuestion: this.errorQuestion
+                    }
+                })
+            } else {
+                this.$router.back()
+            }
+        }
+    }
+}
+</script>
+<style lang="scss" scoped>
+.main {
+    box-sizing: border-box;
+    padding: 6.5vw;
+    height: 100vh;
+    .process-bar {
+        width: 100%;
+        height: 1.4vw;
+        margin-top: 8.5vw;
+        background-color: #f1f1f1;
+        border-radius: 4vw;
+        display: grid;
+        overflow: hidden;
+        gap: 1px;
+    }
+    .question {
+        margin-top: 7vw;
+        &.disabled {
+            pointer-events: none;
+        }
+        .qContent {
+            height: 56vh;
+            overflow-x: scroll;
+            margin-bottom: 4vw;
+            .topic {
+                display: grid;
+                grid-template-columns: 3vw auto;
+                align-items: baseline;
+                margin-bottom: 7vw;
+                span:nth-child(1) {
+                    display: inline-block;
+                    width: 1vw;
+                    height: 3vw;
+                    background-color: var(--yellow);
+                }
+                span:nth-child(2) {
+                    display: inline-block;
+                    font-size: 4.2vw;
+                }
+            }
+            ul {
+                li {
+                    border: 2px solid #747474;
+                    color: #393939;
+                    border-radius: 10vw;
+                    margin-bottom: 6vw;
+                    padding: 2vw 6vw;
+                    text-align: center;
+                    &.cur {
+                        border-color: var(--cyan);
+                        background-color: var(--cyan);
+                        color: #fff;
+                    }
+                    &.err {
+                        border-color: #ff7575;
+                        background-color: #ff7575;
+                        color: #fff;
+                    }
+                }
+            }
+        }
+        .btn {
+            position: absolute;
+            text-align: center;
+            left: 0;
+            bottom: 4vw;
+            width: 100%;
+            button {
+                width: 87vw;
+                height: 10vw;
+                line-height: 10vw;
+                border-radius: 10vw;
+                font-size: 4.8vw;
+                background-color: var(--yellow);
+                font-weight: 600;
+                color: #fff;
+            }
+        }
+        .complete {
+            text-align: center;
+            .success {
+                img {
+                    width: 72vw;
+                }
+            }
+            .fail {
+                img {
+                    width: 53.3vw;
+                }
+            }
+            .score {
+                font-size: 10vw;
+                color: var(--yellow);
+                margin-right: 2vw;
+            }
+        }
+    }
+}
+</style>

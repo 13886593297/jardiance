@@ -1,0 +1,26 @@
+* {
+  margin: 0;
+  padding: 0;
+  -webkit-overflow-scrolling: touch;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+li {
+  list-style: none;
+}
+
+::-webkit-scrollbar {
+  width: 0;
+  background-color: transparent;
+}
+
+button, input {
+  border: none;
+  outline: none;
+}
+
+:root {
+  --yellow: #ffc900;
+  --cyan: #009b96;
+  --brown: #4c3332;
+}
