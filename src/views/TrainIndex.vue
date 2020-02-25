@@ -16,10 +16,6 @@
                     <p class="nameEn" v-if="data.id == 2">Competition Section</p>
                 </router-link>
             </ul>
-            <!-- <div class="btn">
-                <button>名字还没定</button>
-                <button>名字还没定</button>
-            </div> -->
         </div>
         <div class="container" ref="container" v-else>
             <section-component
@@ -61,6 +57,7 @@ export default {
                 type: '基础训练'
             })
             .then(res => {
+                console.log(res.data)
                 this.dataArr = res.data
             })
     },
@@ -112,19 +109,6 @@ export default {
                 font-size: 3vw;
                 color: #a5a5a5;
             }
-        }
-    }
-    .btn {
-        text-align: center;
-        button {
-            width: 74vw;
-            height: 9vw;
-            margin-bottom: 3.5vw;
-            border-radius: 5vw;
-            color: #696969;
-            font-size: 4.2vw;
-            font-weight: 600;
-            background-color: #e0e0e0;
         }
     }
 }

@@ -116,12 +116,14 @@ export default {
             this.answer = ''
             // 添加每一题的选项
             for (let key in this.totalQ[this.curQNo]) {
-                if (this.totalQ[this.curQNo][key] != '') {
+                if (this.totalQ[this.curQNo][key] != '' && this.totalQ[this.curQNo][key] != null) {
                     if (
                         key == 'anwser_a' ||
                         key == 'anwser_b' ||
                         key == 'anwser_c' ||
-                        key == 'anwser_d'
+                        key == 'anwser_d' ||
+                        key == 'anwser_e' ||
+                        key == 'anwser_f'
                     ) {
                         this.options.push(this.totalQ[this.curQNo][key])
                     }

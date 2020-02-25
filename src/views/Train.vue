@@ -1,6 +1,6 @@
 <template>
     <div class="main">
-        <train-header :id="id" :name="name" :sectionEn="true" :curQNo="curQNo" :totalQ="totalQ"></train-header>
+        <train-header :description="description" :name="name" :curQNo="curQNo" :totalQ="totalQ"></train-header>
         <tip v-show="showTip" title="OMG！" content="哎呀，您还没有选择答案哦！"></tip>
         <div class="process-bar" ref="process_bar">
             <div v-for="i in totalQ.length" :key="i"></div>
@@ -58,6 +58,7 @@ export default {
             id: this.$route.params.id,
             name: this.$route.params.name,
             type: this.$route.params.type,
+            description: this.$route.params.description,
             curQNo: 0, // 当前第几道题
             totalQ: [], // 全部题目
             topic: '', // 题目
@@ -120,12 +121,14 @@ export default {
             this.answer = ''
             // 添加每一题的选项
             for (let key in this.totalQ[this.curQNo]) {
-                if (this.totalQ[this.curQNo][key] != '') {
+                if (this.totalQ[this.curQNo][key] != '' && this.totalQ[this.curQNo][key] != null) {
                     if (
                         key == 'anwser_a' ||
                         key == 'anwser_b' ||
                         key == 'anwser_c' ||
-                        key == 'anwser_d'
+                        key == 'anwser_d' ||
+                        key == 'anwser_e' ||
+                        key == 'anwser_f'
                     ) {
                         this.options.push(this.totalQ[this.curQNo][key])
                     }
@@ -196,6 +199,7 @@ export default {
                         id: this.id,
                         name: this.name,
                         status: 1,
+                        description: this.description,
                         errorQuestion: this.errorQuestion
                     }
                 })

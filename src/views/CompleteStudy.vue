@@ -36,6 +36,7 @@ export default {
             name: this.$route.query.name,
             status: this.$route.query.status,
             id: this.$route.query.id,
+            description: this.$route.query.description,
             refuse: false,
             time: ''
         }
@@ -60,7 +61,8 @@ export default {
                             params: {
                                 id: this.id,
                                 name: this.name,
-                                type: this.type
+                                type: this.type,
+                                description: this.description
                             }
                         })
                     } else {

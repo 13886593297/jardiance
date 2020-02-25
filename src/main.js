@@ -8,13 +8,13 @@ import * as Handler from './assets/js/handler'
 import share from './assets/js/share'
 import './assets/css/base.scss'
 
-new VConsole()
+// new VConsole()
 Vue.config.productionTip = false
 if (process.env.NODE_ENV == "development") {
-    Axios.defaults.baseURL = 'http://192.168.1.101:8080'
+    Axios.defaults.baseURL = 'http://192.168.1.145:8080'
 }
 
-const defaultTitle = '非常静距离'
+const defaultTitle = '日静月益'
 router.beforeEach((to, from, next) => {
     document.title = to.meta.title ? to.meta.title : defaultTitle
     let sign = window.localStorage.getItem('sign')

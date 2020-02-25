@@ -1,15 +1,8 @@
 <template>
     <div class="header">
         <div class="left">
-            <div class="top">
-                <!-- <p>第{{id}}章</p> -->
-                <p>第一章</p>
-                <p v-if="sectionEn">
-                    Chapter One
-                    <!-- <span>{{sectionArr[id - 1]}}</span> -->
-                </p>
-            </div>
-            <p class="section">{{name}}</p>
+            <p class="section">SECTION {{description}}</p>
+            <p class="name">{{name}}</p>
         </div>
         <p class="right">
             <span class="curQNo">{{curQNo + 1}}</span>/
@@ -20,22 +13,7 @@
 
 <script>
 export default {
-    data() {
-        return {
-            sectionArr: [
-                'One',
-                'Two',
-                'Three',
-                'Four',
-                'Five',
-                'Six',
-                'Seven',
-                'Eight',
-                'Nine'
-            ]
-        }
-    },
-    props: ['id', 'name', 'sectionEn', 'curQNo', 'totalQ']
+    props: ['description', 'name', 'curQNo', 'totalQ']
 }
 </script>
 
@@ -45,16 +23,10 @@ export default {
     grid-template-columns: 60% 40%;
     align-items: end;
     .left {
-        .top {
-            p:nth-child(1) {
-                font-size: 6.2vw;
-            }
-            p:nth-child(2) {
-                color: #838383;
-                font-size: 4vw;
-            }
-        }
         .section {
+            font-size: 6.2vw;
+        }
+        .name {
             margin-top: 4vw;
             font-size: 4vw;
             color: #565656;

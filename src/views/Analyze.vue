@@ -1,6 +1,6 @@
 <template>
     <div class="analyze">
-        <train-header :id="id" :name="name" :sectionEn="true" :curQNo="totalQ.length - 1" :totalQ="totalQ"></train-header>
+        <train-header :description="description" :name="name" :curQNo="totalQ.length - 1" :totalQ="totalQ"></train-header>
         <div class="processDiv">
             <div class="process-bar" ref="process_bar">
                 <div v-for="i in totalQ.length" :key="i"></div>
@@ -45,6 +45,7 @@ export default {
             status: this.$route.params.status,
             totalQ: this.$route.params.errorQuestion,
             categoryId: this.$route.params.categoryId,
+            description: this.$route.params.description,
             topic: '',
             qCorrect: '',
             options: [],
