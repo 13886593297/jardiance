@@ -41,9 +41,8 @@ export default {
                 }
             })
             .then(res => {
-                // console.log(res)
                 this.sections = res.data
-                this.$refs.container.style.gridTemplateRows = `repeat(${this.sections.length}, 42vw)`
+                // this.$refs.container.style.gridTemplateRows = `repeat(${this.sections.length}, 42vw)`
             })
     },
     methods: {
@@ -58,7 +57,7 @@ export default {
             }
             setTimeout(() => {
                 this.sections = val.data
-                this.$refs.container.style.gridTemplateRows = `repeat(${this.sections.length}, 42vw)`
+                // this.$refs.container.style.gridTemplateRows = `repeat(${this.sections.length}, 42vw)`
             }, 500)
         }
     }
@@ -71,7 +70,7 @@ export default {
     height: calc(100vh - 22.3vw);
     text-align: center;
     display: grid;
-    grid-template-rows: repeat(3, 42vw);
+    grid-template-rows: repeat(auto-fill, 42vw);
     overflow-y: scroll;
 }
 </style>

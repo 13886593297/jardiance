@@ -4,7 +4,7 @@
         <div class="header">
             <div class="header-arrow">
                 <img src="../assets/img/details/back.png" @click="back" alt />
-                <h4 v-if="type == '基础训练'">SECTION{{sort}}</h4>
+                <h4 v-if="type == '基础训练'">SECTION{{description}}</h4>
                 <h4 v-else class="small">欧唐静产品介绍应用习题1</h4>
                 <img src="../assets/img/details/next.png" @click="next" alt />
             </div>
@@ -63,7 +63,6 @@ export default {
             showTip: false,
             nextArticleId: null,
             trainStatus: null,
-            sort: null,
             type: '',
             description: ''
         }
@@ -82,7 +81,6 @@ export default {
                 this.$axios.spread((read, articleList) => {
                     this.uuid = read.data.uuid
                     this.name = articleList.data[0][0].name
-                    this.sort = articleList.data[0][0].sort
                     this.type = articleList.data[0][0].type
                     this.nextArticleId = articleList.data[0][0].nextArticleId
                     this.trainStatus = articleList.data[0][0].trainStatus
@@ -171,7 +169,6 @@ export default {
                     })
                     .then(res => {
                         this.id = res.data[0][0].id
-                        this.sort = res.data[0][0].sort
                         this.name = res.data[0][0].name
                         this.nextArticleId = res.data[0][0].nextArticleId
                         this.trainStatus = res.data[0][0].trainStatus
@@ -201,7 +198,6 @@ export default {
                 name: 'completeStudy',
                 query: {
                     id: this.id,
-                    sort: this.sort,
                     name: this.name,
                     status: this.trainStatus,
                     type: this.type,
@@ -261,6 +257,7 @@ export default {
         .ball {
             position: absolute;
             width: 100%;
+            height: 14.6vw;
             bottom: 0;
             text-align: center;
             font-size: 0;

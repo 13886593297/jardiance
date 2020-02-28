@@ -45,7 +45,7 @@ export default {
             status: this.$route.params.status,
             totalQ: this.$route.params.errorQuestion,
             categoryId: this.$route.params.categoryId,
-            description: this.$route.params.description,
+            description: this.$route.params.description || this.$route.params.errorQuestion[0].description,
             topic: '',
             qCorrect: '',
             options: [],
@@ -74,7 +74,6 @@ export default {
     },
     methods: {
         init() {
-            console.log(this.totalQ)
             this.totalQ.forEach(item => {
                 let correntQ = this.obj[item.anwser_correct.trim()]
                 let options = []

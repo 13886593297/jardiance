@@ -9,7 +9,7 @@
             <p class="text" v-if="section.trainStatus == '2'">很遗憾，未通过测试，请继续努力！</p>
             <p class="text" v-if="section.trainStatus == '1'">恭喜您已通过本章测试！</p>
             <p class="text" v-if="section.trainStatus == '0'">快来学习本章内容吧！</p>
-            <p class="number">SECTION{{section.sort}}</p>
+            <p class="number">SECTION{{section.description}}</p>
             <p class="name">{{section.name}}</p>
             <div class="go">
                 <span></span>
@@ -100,6 +100,10 @@ export default {
         .name {
             color: #fff;
             font-size: 4vw;
+            width: 100vw;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
         }
         .go {
             background-color: #fff;

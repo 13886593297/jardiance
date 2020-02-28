@@ -109,8 +109,8 @@ export default {
             ])
             .then(
                 this.$axios.spread((qStatus, article) => {
-                    console.log(qStatus)
-                    console.log(article)
+                    // console.log(qStatus)
+                    // console.log(article)
                     this.failQuestionInfo = qStatus.data
                     if (article.data.length == 0) {
                         this.noQues = true
@@ -191,7 +191,6 @@ export default {
                     status
                 })
                 .then(res => {
-                    console.log(res)
                     this.$router.push({
                         name: 'analyze',
                         params: {
