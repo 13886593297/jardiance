@@ -55,7 +55,9 @@ export default {
                 A: 0,
                 B: 1,
                 C: 2,
-                D: 3
+                D: 3,
+                E: 4,
+                F: 5
             }
         }
     },
@@ -78,7 +80,7 @@ export default {
                 let correntQ = this.obj[item.anwser_correct.trim()]
                 let options = []
                 for (let key in item) {
-                    if (item[key] && key == 'anwser_a' || key == 'anwser_b' || key == 'anwser_c' || key == 'anwser_d') {
+                    if (item[key] && key == 'anwser_a' || key == 'anwser_b' || key == 'anwser_c' || key == 'anwser_d' || key == 'anwser_e' || key == 'anwser_f') {
                         options.push(item[key])
                     }
                 }
