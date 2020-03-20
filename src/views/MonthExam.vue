@@ -27,27 +27,36 @@
                     </ul>
                 </div>
                 <div class="complete" v-show="isEnd">
-                    <div class="success" v-show="!errorNum">
-                        <img src="../assets/img/train/success.png" alt />
-                        <p>
-                            恭喜您全部答对获得
-                            <br />
-                            <span class="score">{{score}}</span>积分
-                        </p>
-                    </div>
-                    <div class="fail" v-show="errorNum">
-                        <img src="../assets/img/train/fail.png" alt />
-                        <p>
-                            正确{{correctNum}}道，获得{{score}}积分，错误题数
-                            <span class="score">{{errorNum}}</span>题，
-                        </p>
-                        <p>您可在下个月月考中重新答题。</p>
-                    </div>
+                    <template v-if="status == 0">
+                        <div class="success" v-if="result.status == 4">
+                            <img src="../assets/img/train/success.png" alt />
+                            <p>
+                                恭喜通过本次考试！
+                                <br />
+                                获得<span class="score">{{result.score}}</span>积分
+                            </p>
+                        </div>
+                        <div class="fail" v-else>
+                            <img src="../assets/img/train/fail_01.png" alt />
+                            <p>很遗憾您未通过本次考试</p>
+                            <p>请在三天后参加补考</p>
+                        </div>
+                    </template>
+                    <template v-else>
+                        <div class="success" v-if="result.status == 6">
+                            <img src="../assets/img/train/success.png" alt />
+                            <p>恭喜补考通过！</p>
+                        </div>
+                        <div class="fail" v-else>
+                            <img src="../assets/img/train/fail_01.png" alt />
+                            <p>很遗憾您未通过补考</p>
+                        </div>
+                    </template>
                 </div>
             </div>
             <div class="btn">
                 <button class="submit" @click="submit" v-if="show">{{subText}}</button>
-                <button class="submit" @click="back" v-if="isEnd">返回</button>
+                <button class="submit" @click="back" v-if="isEnd">{{status == 0 ? '结束月考' : '结束补考'}}</button>
             </div>
         </div>
     </div>
@@ -65,31 +74,29 @@ export default {
             qCorrect: '', // 正确答案
             subText: '',
             isEnd: false,
-            errorNum: 0,
             show: true,
-            score: 0,
-            correctNum: 0, // 正确题数
-            len: 0
+            len: 0,
+            status: this.$route.params.status,
+            examId: this.$route.params.examId,
+            result: {}
         }
     },
     created() {
-        this.$axios.post(this.$baseUrl.getLastMonthFailQuestionList, {
-                year: this.$route.query.year,
-                month: this.$route.query.month
-            }).then(res => {
-                this.getData(res.data.data)
+        this.$axios.get(this.$baseUrl.startMonthExam, {params: {examId: this.examId}})
+            .then(res => {
+                this.getData(res.data)
             })
     },
     methods: {
         getData(data) {
             this.totalQ = data
             this.curQNo = this.totalQ.findIndex(
-                item => item.reply == 'null'
+                item => item.reply == null
             )
             this.$refs.process_bar.style.gridTemplateColumns = `repeat(${this.totalQ.length}, 1fr)`
             this.$nextTick(() => {
                 this.totalQ.forEach((item, i) => {
-                    if (item.reply != 'null') {
+                    if (item.reply != null) {
                         this.$refs.process_bar.children[i].style.backgroundColor = item.is_correct ? '#009b96' : '#fd7572'
                     } else {
                         this.len++
@@ -100,9 +107,10 @@ export default {
             this.init()
         },
         init() {
+            // console.log(this.totalQ, this.curQNo)
             this.topic = this.totalQ[this.curQNo].question
             this.qCorrect = this.totalQ[this.curQNo].anwser_correct.trim()
-            console.log('正确答案为', this.qCorrect)
+            // console.log('正确答案为', this.qCorrect)
             // 重置选项和玩家选择的答案
             this.options = []
             this.answer = ''
@@ -145,17 +153,15 @@ export default {
             let reply = String.fromCharCode(65 + parseInt(this.answer))
             let isCorrect = reply == this.qCorrect ? 1 : 0
 
-            this.$axios.post(this.$baseUrl.submitErrorQuestion, {
+            this.$axios.post(this.$baseUrl.submitMonthExam, {
                 reply,
                 isCorrect,
-                questionNum: this.totalQ.length,
+                examId: this.examId,
                 qid: this.totalQ[this.curQNo].id,
                 isEnd: this.curQNo == this.totalQ.length - 1
             }).then(res => {
-                console.log(res)
-                this.score = res.data.successScore
-                this.correctNum = res.data.successNum
-                this.errorNum = res.data.errorNum || 0
+                // console.log(res)
+                this.result = res.data
             })
 
             if (isCorrect == 1) {
@@ -168,7 +174,7 @@ export default {
             }
         },
         back() {
-            this.$router.back()
+            this.$router.replace({name: 'index'})
         }
     }
 }
@@ -263,51 +269,6 @@ export default {
             }
         }
         .complete {
-            // text-align: center;
-            // position: absolute;
-            // top: 0;
-            // left: 0;
-            // width: 100%;
-            // height: 100%;
-            // z-index: 111;
-            // background-color: rgba(0, 0, 0, 0.6);
-            // > div {
-            //     padding-top: 10vw;
-            //     position: relative;
-            //     img {
-            //         width: 66.6vw;
-            //     }
-            //     p {
-            //         color: #fff;
-            //         font-size: 5.3vw;
-            //         position: absolute;
-            //         width: 100%;
-            //         bottom: 21vw;
-            //     }
-            //     button {
-            //         width: 55vw;
-            //         height: 11vw;
-            //         line-height: 11vw;
-            //         color: #fff;
-            //         background-color: #f6c939;
-            //         font-size: 6vw;
-            //         letter-spacing: 6vw;
-            //         border-radius: 6vw;
-            //         text-indent: 6vw;
-            //         margin-top: 2vw;
-            //     }
-            //     .score {
-            //         font-size: 10vw;
-            //         color: #f6c939;
-            //         margin-right: 2vw;
-            //     }
-            // }
-            // .fail {
-            //     img {
-            //         width: 53.3vw;
-            //     }
-            // }
-
             text-align: center;
             .success {
                 img {
@@ -322,7 +283,7 @@ export default {
             .score {
                 font-size: 10vw;
                 color: var(--yellow);
-                margin-right: 2vw;
+                margin: 0 1vw;
             }
         }
     }

@@ -37,7 +37,7 @@
                             正确{{correctNum}}道，获得{{score}}积分，错误题数
                             <span class="score">{{errorNum}}</span>题，
                         </p>
-                        <p>详见题目分析，您可在三天后重新答题。</p>
+                        <p>详见题目分析，您可在一天后重新答题。</p>
                     </div>
                 </div>
             </div>

@@ -15,6 +15,10 @@ export default {
     getArticleByArticleId: '/api/train/getArticleByArticleId',
     getLastMonthFailQuestionStatus: '/api/train/getLastMonthFailQuestionStatus',
     getLastMonthFailQuestionList: 'api/train/getLastMonthFailQuestionList',
-    getErrorArticleList: 'api/train/getErrorArticleList'
+    getErrorArticleList: 'api/train/getErrorArticleList',
+    getMonthExamStatus: '/api/train/getMonthExamStatus',
+    startMonthExam: '/api/train/startMonthExam',
+    submitMonthExam: '/api/train/submitMonthExam',
+    getExamTime: '/api/train/getExamTime'
   }
   

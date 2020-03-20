@@ -11,6 +11,8 @@ import ErrorCollection from '../views/ErrorCollection.vue'
 import Rank from '../views/Rank.vue'
 import ErrorTrain from '../views/ErrorTrain.vue'
 import Medical from '../views/Medical.vue'
+import MonthExamIndex from '../views/MonthExamIndex.vue'
+import MonthExam from '../views/MonthExam.vue'
 
 Vue.use(VueRouter)
 
@@ -26,6 +28,8 @@ const routes = [
     { path: '/rank', name: 'rank', component: Rank, meta: { title: '排行榜' } },
     { path: '/errorTrain', name: 'errorTrain', component: ErrorTrain, meta: { title: '错题月考' } },
     { path: '/medical', name: 'medical', component: Medical, meta: { title: '医讯速递' } },
+    { path: '/monthExamIndex', name: 'monthExamIndex', component: MonthExamIndex},
+    { path: '/monthExam', name: 'monthExam', component: MonthExam, meta: { title: '全员月考' }},
     { path: '*', redirect: '/'}
 ]
 
