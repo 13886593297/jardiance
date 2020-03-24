@@ -15,6 +15,7 @@ export default {
             if (typeof res.data == 'string') {
                 window.location.href = res.data
             } else if (res.data.userCode == 2) {
+                document.querySelector('#app').style.display = 'block'
                 window.sessionStorage.setItem('user', JSON.stringify(res.data.reUserInfo))
                 hash = window.sessionStorage.getItem('hash')
                 if (hash) {
@@ -22,7 +23,7 @@ export default {
                     window.sessionStorage.removeItem('hash')
                 }
             } else {
-                alert('无权限访问')
+                alert('请联系管理员')
                 setTimeout(() => {
                     WeixinJSBridge.call('closeWindow')
                 }, 100)
@@ -38,6 +39,7 @@ export default {
 #app {
     background-color: #fff;
     height: 100vh;
+    display: none;
     box-sizing: border-box;
 }
 </style>

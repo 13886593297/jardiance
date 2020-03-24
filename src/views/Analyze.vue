@@ -11,7 +11,7 @@
                 <li :key="key" v-if="item.is_correct == 2">
                     <p>题目{{key + 1}} {{item.question}}</p>
                     <div>正确答案</div>
-                    <p>{{item.correntAnwser}}</p>
+                    <p v-for="(correntAnwser, i) in item.correntAnwser" :key="i">{{correntAnwser}}</p>
                 </li>
             </template>
         </ul>
@@ -77,14 +77,22 @@ export default {
     methods: {
         init() {
             this.totalQ.forEach(item => {
-                let correntQ = this.obj[item.anwser_correct.trim()]
+                let cAnswer = item.anwser_correct.trim()
                 let options = []
                 for (let key in item) {
                     if (item[key] && key == 'anwser_a' || key == 'anwser_b' || key == 'anwser_c' || key == 'anwser_d' || key == 'anwser_e' || key == 'anwser_f') {
                         options.push(item[key])
                     }
                 }
-                item.correntAnwser = options[correntQ]
+
+                item.correntAnwser = []
+                if (item.type == 2) {
+                    cAnswer.split(',').map(index => {
+                        item.correntAnwser.push(`${index}: ${options[this.obj[index]]}`)
+                    })
+                } else {
+                    item.correntAnwser.push(`${cAnswer}: ${options[this.obj[cAnswer]]}`)
+                }
             })
         },
         restart() {

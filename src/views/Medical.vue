@@ -54,6 +54,7 @@ export default {
     },
     filters: {
         timeformat(time) {
+            console.log(time)
             let date = time.split('T')[0].split('-')
             return date[1] + '/' + date[2]
         }
@@ -78,6 +79,7 @@ export default {
                 })
                 .then(res => {
                     this.list = res.data
+                    console.log(this.list)
                 })
         },
 
@@ -133,9 +135,10 @@ export default {
                 border-radius: 1vw;
                 -webkit-box-shadow: 0 0 2vw #ccc;
                 box-shadow: 0 0 2vw #ccc;
-                height: 31.2vw;
+                min-height: 31.2vw;
                 box-sizing: border-box;
                 margin-bottom: 4vw;
+                position: relative;
                 .top {
                     display: grid;
                     grid-template-columns: 80% 20%;
@@ -162,7 +165,8 @@ export default {
                 }
                 .text {
                     font-size: 2.7vw;
-                    margin-top: 8vw;
+                    position: absolute;
+                    bottom: 2vw;
                 }
                 &.fail {
                     border-color: #ffd502;
@@ -192,18 +196,26 @@ export default {
         }
         &.new {
             li {
-                height: 18vw;
+                min-height: 18vw;
                 padding-top: 1.5vw;
                 padding-left: 4.5vw;
                 padding-bottom: 0;
                 .top {
-                    height: 8vw;
+                    > div {
+                        &:nth-child(1) {
+                            display: grid;
+                            grid-template-columns: 20% 80%;
+                            align-items: center;
+                        }
+                    }
                     .time,
                     .name {
                         display: inline-block;
                     }
                     .name {
+                        margin-top: 0;
                         margin-left: 4vw;
+                        font-size: 3.5vw;
                     }
                 }
                 .text {

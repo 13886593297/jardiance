@@ -20,7 +20,7 @@
                         <li
                             v-for="(option, index) in options"
                             :class="{ cur: answer === index }"
-                            @click="answer = index"
+                            @click="multipleType == 1 ? answer = index : multiple(index)"
                             :key="index"
                             ref="li"
                         >{{option}}</li>
@@ -69,7 +69,9 @@ export default {
             show: true,
             score: 0,
             correctNum: 0, // 正确题数
-            len: 0
+            len: 0,
+            multipleType: 1, // 题目类型，1单选，2多选
+            multipleAnswer: ['', '', '', '', '', ''], // 多选题回答
         }
     },
     created() {
@@ -100,12 +102,15 @@ export default {
             this.init()
         },
         init() {
-            this.topic = this.totalQ[this.curQNo].question
+            this.multipleType = this.totalQ[this.curQNo].type
+            this.topic = this.totalQ[this.curQNo].question + (this.multipleType == 1 ? '' : '(多选题)')
             this.qCorrect = this.totalQ[this.curQNo].anwser_correct.trim()
             console.log('正确答案为', this.qCorrect)
             // 重置选项和玩家选择的答案
             this.options = []
             this.answer = ''
+            this.multipleAnswer = ['', '', '', '', '', '']
+
             // 添加每一题的选项
             for (let key in this.totalQ[this.curQNo]) {
                 if (this.totalQ[this.curQNo][key] != '' && this.totalQ[this.curQNo][key] != null) {
@@ -122,8 +127,34 @@ export default {
                 }
             }
         },
+        multiple(index) {
+            if (this.$refs.li[index].classList.contains('cur')) {
+                this.$refs.li[index].classList.remove('cur')
+                this.multipleAnswer.splice(index, 1, '')
+            } else {
+                this.$refs.li[index].classList.add('cur')
+                this.multipleAnswer.splice(index, 1, index)
+            }
+        },
         submit() {
-            if (this.answer === '') return
+            if (this.multipleType == 2) {
+                this.answer = []
+                this.multipleAnswer.map(item => {
+                    if (item !== '') {
+                        this.answer.push(item)
+                    }
+                })
+            }
+
+            let isEmpty = this.multipleAnswer.find((item) => item !== '')
+            if ((this.multipleType == 1 && this.answer === '') || (this.multipleType == 2 && isEmpty === undefined)) {
+                this.showTip = true
+                setTimeout(() => {
+                    this.showTip = false
+                }, 2000)
+                return
+            } 
+
             if (this.subText == '提交') {
                 this.show = false
             }
@@ -132,6 +163,10 @@ export default {
                 if (this.curQNo < this.totalQ.length - 1) {
                     this.curQNo += 1
                     this.init()
+                    this.$refs.li.map(item => {
+                        item.classList = ''
+                    })
+
                     if (this.curQNo == this.totalQ.length - 1) {
                         this.subText = '提交'
                     }
@@ -142,7 +177,16 @@ export default {
             }, 2000)
 
             // 把玩家选择的0，1，2，3转化成A，B，C，D
-            let reply = String.fromCharCode(65 + parseInt(this.answer))
+            let reply = ''
+            if (this.multipleType == 2) {
+                this.answer.map(item => {
+                    reply += String.fromCharCode(65 + parseInt(item))
+                })
+                reply = reply.split('').join(',')
+            } else {
+                reply = String.fromCharCode(65 + parseInt(this.answer))
+            }
+
             let isCorrect = reply == this.qCorrect ? 1 : 0
 
             this.$axios.post(this.$baseUrl.submitErrorQuestion, {
@@ -158,13 +202,49 @@ export default {
                 this.errorNum = res.data.errorNum || 0
             })
 
-            if (isCorrect == 1) {
-                this.$refs.li[this.answer].classList = 'cur'
-                this.$refs.process_bar.children[this.curQNo].style.backgroundColor = '#009b96'
-                
+            if (this.multipleType == 1) {
+                if (isCorrect == 1) {
+                    this.$refs.li[this.answer].classList.add('cur')
+                    this.$refs.process_bar.children[this.curQNo].style.backgroundColor = '#009b96'
+                } else {
+                    this.$refs.li[this.answer].classList.add('err')
+                    this.$refs.process_bar.children[this.curQNo].style.backgroundColor = '#fd7572'
+                }
             } else {
-                this.$refs.li[this.answer].classList = 'err'
-                this.$refs.process_bar.children[this.curQNo].style.backgroundColor = '#fd7572'
+                if (isCorrect == 1) {
+                    this.$refs.process_bar.children[this.curQNo].style.backgroundColor = '#009b96'
+                } else {
+                    this.qCorrect.split(',').map(item => {
+                        switch (item) {
+                            case 'A':
+                                this.$refs.li[0].classList.add('cur')
+                                break
+                            case 'B':
+                                this.$refs.li[1].classList.add('cur')
+                                break
+                            case 'C':
+                                this.$refs.li[2].classList.add('cur')
+                                break
+                            case 'D':
+                                this.$refs.li[3].classList.add('cur')
+                                break
+                            case 'E':
+                                this.$refs.li[4].classList.add('cur')
+                                break
+                            case 'F':
+                                this.$refs.li[5].classList.add('cur')
+                                break
+                        }
+                    })
+                    
+                    this.answer.map(index => {
+                        let key = String.fromCharCode(65 + parseInt(index))
+                        if (!this.qCorrect.split(',').find(item => item == key)) {
+                            this.$refs.li[index].classList.add('err')
+                        }
+                    })
+                    this.$refs.process_bar.children[this.curQNo].style.backgroundColor = '#fd7572'
+                }
             }
         },
         back() {
