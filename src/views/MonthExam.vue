@@ -39,7 +39,7 @@
                         <div class="fail" v-else>
                             <img src="../assets/img/train/fail_01.png" alt />
                             <p>很遗憾您未通过本次考试</p>
-                            <p>请在三天后参加补考</p>
+                            <p>请在{{time}}后参加补考</p>
                         </div>
                     </template>
                     <template v-else>
@@ -67,7 +67,6 @@ export default {
     data() {
         return {
             curQNo: 0,
-            totalQ: [],
             topic: '', // 题目
             options: [], // 题目选项
             answer: '', // 玩家选择的答案
@@ -78,36 +77,39 @@ export default {
             len: 0,
             status: this.$route.params.status,
             examId: this.$route.params.examId,
+            totalQ: this.$route.params.data,
+            time: this.$route.params.time,
             result: {},
             multipleType: 1, // 题目类型，1单选，2多选
             multipleAnswer: ['', '', '', '', '', ''], // 多选题回答
+            obj: {
+                A: 0,
+                B: 1,
+                C: 2,
+                D: 3,
+                E: 4,
+                F: 5
+            }
         }
     },
-    created() {
-        this.$axios.get(this.$baseUrl.startMonthExam, {params: {examId: this.examId}})
-            .then(res => {
-                this.getData(res.data)
+    mounted() {
+        this.curQNo = this.totalQ.findIndex(
+            item => item.reply == 'null'
+        )
+        this.$refs.process_bar.style.gridTemplateColumns = `repeat(${this.totalQ.length}, 1fr)`
+        this.$nextTick(() => {
+            this.totalQ.forEach((item, i) => {
+                if (item.reply != 'null') {
+                    this.$refs.process_bar.children[i].style.backgroundColor = item.is_correct ? '#009b96' : '#fd7572'
+                } else {
+                    this.len++
+                }
             })
+            this.subText = this.len > 1 ? '下一题' : '提交'
+        })
+        this.init()
     },
     methods: {
-        getData(data) {
-            this.totalQ = data
-            this.curQNo = this.totalQ.findIndex(
-                item => item.reply == null
-            )
-            this.$refs.process_bar.style.gridTemplateColumns = `repeat(${this.totalQ.length}, 1fr)`
-            this.$nextTick(() => {
-                this.totalQ.forEach((item, i) => {
-                    if (item.reply != null) {
-                        this.$refs.process_bar.children[i].style.backgroundColor = item.is_correct ? '#009b96' : '#fd7572'
-                    } else {
-                        this.len++
-                    }
-                })
-                this.subText = this.len > 1 ? '下一题' : '提交'
-            })
-            this.init()
-        },
         init() {
             this.multipleType = this.totalQ[this.curQNo].type
             this.topic = this.totalQ[this.curQNo].question + (this.multipleType == 1 ? '' : '(多选题)')
@@ -220,35 +222,24 @@ export default {
                 if (isCorrect == 1) {
                     this.$refs.process_bar.children[this.curQNo].style.backgroundColor = '#009b96'
                 } else {
-                    this.qCorrect.split(',').map(item => {
-                        switch (item) {
-                            case 'A':
-                                this.$refs.li[0].classList.add('cur')
-                                break
-                            case 'B':
-                                this.$refs.li[1].classList.add('cur')
-                                break
-                            case 'C':
-                                this.$refs.li[2].classList.add('cur')
-                                break
-                            case 'D':
-                                this.$refs.li[3].classList.add('cur')
-                                break
-                            case 'E':
-                                this.$refs.li[4].classList.add('cur')
-                                break
-                            case 'F':
-                                this.$refs.li[5].classList.add('cur')
-                                break
+                    let qCArr = this.qCorrect.split(',')
+                    for (let i = 0; i < qCArr.length; i++) {
+                        let answer_item = String.fromCharCode(65 + parseInt(this.answer[i]))
+                        if (answer_item != qCArr[i]) {
+                            this.$refs.li[qCArr[i].charCodeAt() - 65].classList.add('cur1')
+                            this.answer[i] && this.$refs.li[this.answer[i]].classList.add('err')
                         }
-                    })
-                    
-                    this.answer.map(index => {
-                        let key = String.fromCharCode(65 + parseInt(index))
-                        if (!this.qCorrect.split(',').find(item => item == key)) {
-                            this.$refs.li[index].classList.add('err')
+                    }
+
+                    if (qCArr.length < this.answer.length) {
+                        for (let j = 0; j < this.answer.length; j++) {
+                            let answer_item = String.fromCharCode(65 + parseInt(this.answer[j]))
+                            if (qCArr[j] !== answer_item) {
+                                this.$refs.li[this.obj[answer_item]].classList.add('err')
+                            }
                         }
-                    })
+                    }
+
                     this.$refs.process_bar.children[this.curQNo].style.backgroundColor = '#fd7572'
                 }
             }
@@ -322,6 +313,10 @@ export default {
                         border-color: #009b96;
                         background-color: #009b96;
                         color: #fff;
+                    }
+                    &.cur1 {
+                        border-color: var(--cyan);
+                        color: var(--cyan);
                     }
                     &.err {
                         border-color: #ff7575;

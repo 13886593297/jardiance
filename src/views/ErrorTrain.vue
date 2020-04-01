@@ -72,6 +72,14 @@ export default {
             len: 0,
             multipleType: 1, // 题目类型，1单选，2多选
             multipleAnswer: ['', '', '', '', '', ''], // 多选题回答
+            obj: {
+                A: 0,
+                B: 1,
+                C: 2,
+                D: 3,
+                E: 4,
+                F: 5
+            }
         }
     },
     created() {
@@ -214,35 +222,24 @@ export default {
                 if (isCorrect == 1) {
                     this.$refs.process_bar.children[this.curQNo].style.backgroundColor = '#009b96'
                 } else {
-                    this.qCorrect.split(',').map(item => {
-                        switch (item) {
-                            case 'A':
-                                this.$refs.li[0].classList.add('cur')
-                                break
-                            case 'B':
-                                this.$refs.li[1].classList.add('cur')
-                                break
-                            case 'C':
-                                this.$refs.li[2].classList.add('cur')
-                                break
-                            case 'D':
-                                this.$refs.li[3].classList.add('cur')
-                                break
-                            case 'E':
-                                this.$refs.li[4].classList.add('cur')
-                                break
-                            case 'F':
-                                this.$refs.li[5].classList.add('cur')
-                                break
+                    let qCArr = this.qCorrect.split(',')
+                    for (let i = 0; i < qCArr.length; i++) {
+                        let answer_item = String.fromCharCode(65 + parseInt(this.answer[i]))
+                        if (answer_item != qCArr[i]) {
+                            this.$refs.li[qCArr[i].charCodeAt() - 65].classList.add('cur1')
+                            this.answer[i] && this.$refs.li[this.answer[i]].classList.add('err')
                         }
-                    })
-                    
-                    this.answer.map(index => {
-                        let key = String.fromCharCode(65 + parseInt(index))
-                        if (!this.qCorrect.split(',').find(item => item == key)) {
-                            this.$refs.li[index].classList.add('err')
+                    }
+
+                    if (qCArr.length < this.answer.length) {
+                        for (let j = 0; j < this.answer.length; j++) {
+                            let answer_item = String.fromCharCode(65 + parseInt(this.answer[j]))
+                            if (qCArr[j] !== answer_item) {
+                                this.$refs.li[this.obj[answer_item]].classList.add('err')
+                            }
                         }
-                    })
+                    }
+
                     this.$refs.process_bar.children[this.curQNo].style.backgroundColor = '#fd7572'
                 }
             }
@@ -317,6 +314,10 @@ export default {
                         background-color: #009b96;
                         color: #fff;
                     }
+                    &.cur1 {
+                        border-color: var(--cyan);
+                        color: var(--cyan);
+                    }
                     &.err {
                         border-color: #ff7575;
                         background-color: #ff7575;
@@ -343,51 +344,6 @@ export default {
             }
         }
         .complete {
-            // text-align: center;
-            // position: absolute;
-            // top: 0;
-            // left: 0;
-            // width: 100%;
-            // height: 100%;
-            // z-index: 111;
-            // background-color: rgba(0, 0, 0, 0.6);
-            // > div {
-            //     padding-top: 10vw;
-            //     position: relative;
-            //     img {
-            //         width: 66.6vw;
-            //     }
-            //     p {
-            //         color: #fff;
-            //         font-size: 5.3vw;
-            //         position: absolute;
-            //         width: 100%;
-            //         bottom: 21vw;
-            //     }
-            //     button {
-            //         width: 55vw;
-            //         height: 11vw;
-            //         line-height: 11vw;
-            //         color: #fff;
-            //         background-color: #f6c939;
-            //         font-size: 6vw;
-            //         letter-spacing: 6vw;
-            //         border-radius: 6vw;
-            //         text-indent: 6vw;
-            //         margin-top: 2vw;
-            //     }
-            //     .score {
-            //         font-size: 10vw;
-            //         color: #f6c939;
-            //         margin-right: 2vw;
-            //     }
-            // }
-            // .fail {
-            //     img {
-            //         width: 53.3vw;
-            //     }
-            // }
-
             text-align: center;
             .success {
                 img {

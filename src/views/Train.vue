@@ -77,6 +77,14 @@ export default {
             timer: null, // 每题答完后设置计时器禁止点击
             multipleType: 1, // 题目类型，1单选，2多选
             multipleAnswer: ['', '', '', '', '', ''], // 多选题回答
+            obj: {
+                A: 0,
+                B: 1,
+                C: 2,
+                D: 3,
+                E: 4,
+                F: 5
+            }
         }
     },
     created() {
@@ -217,11 +225,9 @@ export default {
                         this.score = res.data.correctScore
                         this.errorQuestion = res.data.questionInfo || []
                         this.errorNum = res.data.errorNum || 0
-                        // console.log(this.errorQuestion)
                     }
                 })
 
-            // console.log(this.answer)
             if (this.multipleType == 1) {
                 if (isCorrect == 1) {
                     this.$refs.li[this.answer].classList.add('cur')
@@ -234,35 +240,24 @@ export default {
                 if (isCorrect == 1) {
                     this.$refs.process_bar.children[this.curQNo].style.backgroundColor = '#009b96'
                 } else {
-                    this.qCorrect.split(',').map(item => {
-                        switch (item) {
-                            case 'A':
-                                this.$refs.li[0].classList.add('cur')
-                                break
-                            case 'B':
-                                this.$refs.li[1].classList.add('cur')
-                                break
-                            case 'C':
-                                this.$refs.li[2].classList.add('cur')
-                                break
-                            case 'D':
-                                this.$refs.li[3].classList.add('cur')
-                                break
-                            case 'E':
-                                this.$refs.li[4].classList.add('cur')
-                                break
-                            case 'F':
-                                this.$refs.li[5].classList.add('cur')
-                                break
+                    let qCArr = this.qCorrect.split(',')
+                    for (let i = 0; i < qCArr.length; i++) {
+                        let answer_item = String.fromCharCode(65 + parseInt(this.answer[i]))
+                        if (answer_item != qCArr[i]) {
+                            this.$refs.li[qCArr[i].charCodeAt() - 65].classList.add('cur1')
+                            this.answer[i] && this.$refs.li[this.answer[i]].classList.add('err')
                         }
-                    })
-                    
-                    this.answer.map(index => {
-                        let key = String.fromCharCode(65 + parseInt(index))
-                        if (!this.qCorrect.split(',').find(item => item == key)) {
-                            this.$refs.li[index].classList.add('err')
+                    }
+
+                    if (qCArr.length < this.answer.length) {
+                        for (let j = 0; j < this.answer.length; j++) {
+                            let answer_item = String.fromCharCode(65 + parseInt(this.answer[j]))
+                            if (qCArr[j] !== answer_item) {
+                                this.$refs.li[this.obj[answer_item]].classList.add('err')
+                            }
                         }
-                    })
+                    }
+
                     this.$refs.process_bar.children[this.curQNo].style.backgroundColor = '#fd7572'
                 }
             }
@@ -338,6 +333,10 @@ export default {
                         border-color: var(--cyan);
                         background-color: var(--cyan);
                         color: #fff;
+                    }
+                    &.cur1 {
+                        border-color: var(--cyan);
+                        color: var(--cyan);
                     }
                     &.err {
                         border-color: #ff7575;

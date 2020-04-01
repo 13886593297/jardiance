@@ -54,7 +54,7 @@ export default {
     },
     filters: {
         timeformat(time) {
-            console.log(time)
+            // console.log(time)
             let date = time.split('T')[0].split('-')
             return date[1] + '/' + date[2]
         }
@@ -79,7 +79,7 @@ export default {
                 })
                 .then(res => {
                     this.list = res.data
-                    console.log(this.list)
+                    // console.log(this.list)
                 })
         },
 
@@ -220,6 +220,8 @@ export default {
                 }
                 .text {
                     margin-top: 3.5vw;
+                    position: relative;
+                    bottom: 1vw;
                 }
             }
         }

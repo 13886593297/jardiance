@@ -8,7 +8,7 @@
                 <h5>全员月考</h5>
                 <p>1. 本套试卷共{{examInfo.totalScore}}道题，总分{{examInfo.totalScore}}分，答对{{examInfo.infoScore}}道题及以上则为通过，否则失败。答对一题获得1分，答错获得0分。</p>
                 <p>2. 答对显示绿色，答错显示红色。</p>
-                <p>3. 考试未通过需在三天后参加补考。</p>
+                <p>3. 考试未通过需在{{formatTime(examInfo.redate)}}后参加补考。</p>
                 <p>4. 每套题只有一次补考机会。</p>
             </div>
         </template>
@@ -55,7 +55,7 @@ export default {
     created() {
         this.$axios.get(this.$baseUrl.getMonthExamStatus, {params: {examId: this.examId}})
             .then(res => {
-                // console.log(res.data)
+                console.log(res.data)
                 this.examInfo = res.data
             })
     },
@@ -126,11 +126,18 @@ export default {
                             name: 'monthExam',
                             params: {
                                 status: this.examInfo.status,
-                                examId: this.examId
+                                examId: this.examId,
+                                data: res.data,
+                                time: this.formatTime(this.examInfo.redate)
                             }
                         })
                     }
                 })
+        },
+        formatTime(date) {
+            let d = date / 86400000 >= 1 ? Math.floor(date / 86400000) + '天' : ''
+            let h = (date % 86400000) / 3600000 >= 1 ? Math.floor((date % 86400000) / 3600000) + '小时' : ''
+            return d + h
         }
     }
 }

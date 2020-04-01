@@ -8,7 +8,7 @@ import * as Handler from './assets/js/handler'
 import share from './assets/js/share'
 import './assets/css/base.scss'
 
-// new VConsole()
+new VConsole()
 Vue.config.productionTip = false
 if (process.env.NODE_ENV == "development") {
     Axios.defaults.baseURL = 'http://192.168.1.126:8080'
