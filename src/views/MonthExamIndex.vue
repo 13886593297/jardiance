@@ -135,6 +135,9 @@ export default {
                 })
         },
         formatTime(date) {
+            if (date == 0) {
+                return '答题'
+            }
             let d = date / 86400000 >= 1 ? Math.floor(date / 86400000) + '天' : ''
             let h = (date % 86400000) / 3600000 >= 1 ? Math.floor((date % 86400000) / 3600000) + '小时' : ''
             return d + h
