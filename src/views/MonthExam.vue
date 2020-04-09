@@ -43,7 +43,7 @@
                         </div>
                     </template>
                     <template v-else>
-                        <div class="success" v-if="result.status == 6">
+                        <div class="success" v-if="result.status == 5">
                             <img src="../assets/img/train/success.png" alt />
                             <p>恭喜补考通过！</p>
                         </div>
@@ -75,10 +75,13 @@ export default {
             isEnd: false,
             show: true,
             len: 0,
+            type: this.$route.params.type,
             status: this.$route.params.status,
             examId: this.$route.params.examId,
-            totalQ: this.$route.params.data,
             time: this.$route.params.time,
+            question: this.$route.params.question,
+            passScore: this.$route.params.passScore,
+            totalQ: '',
             result: {},
             multipleType: 1, // 题目类型，1单选，2多选
             multipleAnswer: ['', '', '', '', '', ''], // 多选题回答
@@ -93,23 +96,59 @@ export default {
         }
     },
     mounted() {
-        this.curQNo = this.totalQ.findIndex(
-            item => item.reply == 'null'
-        )
-        this.$refs.process_bar.style.gridTemplateColumns = `repeat(${this.totalQ.length}, 1fr)`
-        this.$nextTick(() => {
-            this.totalQ.forEach((item, i) => {
-                if (item.reply != 'null') {
+        if (this.status == 0) {
+            this.startAnswer()
+        } else {
+            this.totalQ = this.question
+            this.curQNo = this.totalQ.length - 1
+            this.$refs.process_bar.style.gridTemplateColumns = `repeat(${this.totalQ.length}, 1fr)`
+            this.$nextTick(() => {
+                let userScore = 0
+                this.totalQ.forEach((item, i) => {
+                    if (item.is_correct) {
+                        userScore += 1
+                    }
                     this.$refs.process_bar.children[i].style.backgroundColor = item.is_correct ? '#009b96' : '#fd7572'
+                })
+                if (userScore >= this.passScore) {
+                    this.result.status = this.type == 1 ? 4 : 5
+                    this.result.score = userScore
                 } else {
-                    this.len++
+                    this.result.status = this.type == 1 ? 3 : 6
                 }
+                this.status = this.type == 1 ? 0 : 1
+                this.show = false
+                this.isEnd = true
             })
-            this.subText = this.len > 1 ? '下一题' : '提交'
-        })
-        this.init()
+        }
     },
     methods: {
+        startAnswer() {
+            this.$axios.get(this.$baseUrl.startMonthExam, {
+                params: {
+                    type: this.type,
+                    examId: this.examId
+                }
+            })
+            .then(res => {
+                this.totalQ = res.data
+                this.curQNo = this.totalQ.findIndex(
+                    item => item.reply == 'null'
+                )
+                this.$refs.process_bar.style.gridTemplateColumns = `repeat(${this.totalQ.length}, 1fr)`
+                this.$nextTick(() => {
+                    this.totalQ.forEach((item, i) => {
+                        if (item.reply != 'null') {
+                            this.$refs.process_bar.children[i].style.backgroundColor = item.is_correct ? '#009b96' : '#fd7572'
+                        } else {
+                            this.len++
+                        }
+                    })
+                    this.subText = this.len > 1 ? '下一题' : '提交'
+                })
+                this.init()
+            })
+        },
         init() {
             this.multipleType = this.totalQ[this.curQNo].type
             this.topic = this.totalQ[this.curQNo].question + (this.multipleType == 1 ? '' : '(多选题)')
@@ -200,13 +239,17 @@ export default {
             let isCorrect = reply == this.qCorrect ? 1 : 0
 
             this.$axios.post(this.$baseUrl.submitMonthExam, {
+                type: this.type,
                 reply,
                 isCorrect,
                 examId: this.examId,
                 qid: this.totalQ[this.curQNo].id,
                 isEnd: this.curQNo == this.totalQ.length - 1
             }).then(res => {
-                // console.log(res)
+                console.log(res)
+                if (res.data.status > 4) {
+                    this.status = res.data.stauts
+                }
                 this.result = res.data
             })
 

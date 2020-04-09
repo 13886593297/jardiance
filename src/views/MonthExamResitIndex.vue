@@ -1,24 +1,22 @@
 <template>
-    <div class="monthExamIndex">
+    <div class="monthExamResitIndex">
         <div class="pic">
-            <img src="../assets/img/error/4.png" alt />
+            <img src="../assets/img/error/5.png" alt />
         </div>
-        <div class="text monthExam">
-            <h5>全员月考</h5>
-            <p>1. 本套试卷共{{examStatus.totalScore}}道题，总分{{examStatus.totalScore}}分，答对{{examStatus.infoScore}}道题及以上则为通过，否则失败。答对一题获得1分，答错获得0分。</p>
-            <p>2. 答对显示绿色，答错显示红色。</p>
-            <p>3. 考试未通过需在{{formatTime(examStatus.redate)}}后参加补考。</p>
-            <p>4. 每套题只有一次补考机会。</p>
+        <div class="text">
+            <h5>补 考</h5>
+            <p>本次补考不做计分，答对{{examStatus.infoScore}}题及以上，</p>
+            <p>则为通过，否则补考失败。</p>
         </div>
         <div class="btn">
             <button @click="toExam">开始答题</button>
         </div>
         <div class="tip" v-show="show">
             <div>
-                <img class="tipImg" src="../assets/img/error/3.jpg" alt />
+                <img class="tipImg" :src="tipImg" alt />
                 <div class="tipText">
-                    <p>月考结束</p>
-                    <span>很遗憾本次月考已结束</span>
+                    <p>{{tipTextP}}</p>
+                    <span v-html="tipTextSpan"></span>
                 </div>
                 <img class="colse" src="../assets/img/details/close.png" @click="closeBtn" alt />
             </div>
@@ -33,34 +31,42 @@ export default {
             examStatus: {},
             examTime: {},
             show: false,
+            tipImg: require('../assets/img/error/2.jpg'),
+            tipTextP: '月考已合格',
+            tipTextSpan: `您本次月考已合格<br>无需再考`,
             examId: this.$route.query.examId
         }
     },
     created() {
         this.$axios.get(this.$baseUrl.getMonthExamStatus, {
             params: {
-                type: 1,
+                type: 2,
                 examId: this.examId
             }
         }).then(res => {
             console.log(res.data)
             this.examStatus = res.data
             // status = 0 未开始测试
-            // status = 3 未通过月考，显示月考失败页面
-            // status = 4 通过月考，显示月考通过页面
-            // status = 8 月考已结束
-            if (this.examStatus.status == 3 || this.examStatus.status == 4) {
+            // status = 5 通过补考，显示补考通过页面
+            // status = 6 未通过补考，显示补考失败页面
+            // status = 7 已通过月考用户点击，弹出提示
+            // status = 8 补考已结束
+            if (this.examStatus.status == 5 || this.examStatus.status == 6) {
                 this.$router.push({
                     name: 'monthExam',
                     params: {
-                        type: 1,
+                        type: 2,
                         status: this.examStatus.status,
-                        time: this.formatTime(this.examStatus.redate),
                         question: this.examStatus.question,
                         passScore: this.examStatus.infoScore
                     }
                 })
+            } else if (this.examStatus.status == 7) {
+                this.show = true
             } else if (this.examStatus.status == 8) {
+                this.tipImg = require('../assets/img/error/3.jpg')
+                this.tipTextP = '补考结束'
+                this.tipTextSpan = '很遗憾本次补考已结束'
                 this.show = true
             }
         })
@@ -75,28 +81,18 @@ export default {
             this.$router.push({
                 name: 'monthExam',
                 params: {
-                    type: 1,
+                    type: 2,
                     status: this.examStatus.status,
                     examId: this.examId,
-                    time: this.formatTime(this.examStatus.redate)
                 }
             })
-        },
-        /**格式化时间 */
-        formatTime(date) {
-            if (date == 0) {
-                return '答题'
-            }
-            let d = date / 86400000 >= 1 ? Math.floor(date / 86400000) + '天' : ''
-            let h = (date % 86400000) / 3600000 >= 1 ? Math.floor((date % 86400000) / 3600000) + '小时' : ''
-            return d + h
         }
     }
 }
 </script>
 
 <style lang='scss' scoped>
-.monthExamIndex {
+.monthExamResitIndex {
     .pic {
         padding: 12vw 0 6vw;
         text-align: center;
