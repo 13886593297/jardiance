@@ -17,8 +17,8 @@
             <div>
                 <img class="tipImg" src="../assets/img/error/3.jpg" alt />
                 <div class="tipText">
-                    <p>月考结束</p>
-                    <span>很遗憾本次月考已结束</span>
+                    <p>{{tipTextP}}</p>
+                    <span>{{tipTextSpan}}</span>
                 </div>
                 <img class="colse" src="../assets/img/details/close.png" @click="closeBtn" alt />
             </div>
@@ -33,6 +33,8 @@ export default {
             examStatus: {},
             examTime: {},
             show: false,
+            tipTextP: '月考结束',
+            tipTextSpan: `很遗憾本次月考已结束`,
             examId: this.$route.query.examId
         }
     },
@@ -49,6 +51,7 @@ export default {
             // status = 3 未通过月考，显示月考失败页面
             // status = 4 通过月考，显示月考通过页面
             // status = 8 月考已结束
+            // status = 9 未到答题时间
             if (this.examStatus.status == 3 || this.examStatus.status == 4) {
                 this.$router.push({
                     name: 'monthExam',
@@ -61,6 +64,10 @@ export default {
                     }
                 })
             } else if (this.examStatus.status == 8) {
+                this.show = true
+            } else if (this.examStatus.status == 9) {
+                this.tipTextP = '月考未开始'
+                this.tipTextSpan = ''
                 this.show = true
             }
         })

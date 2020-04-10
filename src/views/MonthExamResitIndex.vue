@@ -51,6 +51,7 @@ export default {
             // status = 6 未通过补考，显示补考失败页面
             // status = 7 已通过月考用户点击，弹出提示
             // status = 8 补考已结束
+            // status = 9 未到答题时间
             if (this.examStatus.status == 5 || this.examStatus.status == 6) {
                 this.$router.push({
                     name: 'monthExam',
@@ -67,6 +68,11 @@ export default {
                 this.tipImg = require('../assets/img/error/3.jpg')
                 this.tipTextP = '补考结束'
                 this.tipTextSpan = '很遗憾本次补考已结束'
+                this.show = true
+            } else if (this.examStatus.status == 9) {
+                this.tipImg = require('../assets/img/error/3.jpg')
+                this.tipTextP = '补考未开始'
+                this.tipTextSpan = ''
                 this.show = true
             }
         })
