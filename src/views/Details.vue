@@ -34,7 +34,7 @@
                 </div>
             </div>
         </div>
-        <div class="zoomTip">
+        <div class="zoomTip" v-if="tipShow">
             <img src="../assets/img/details/hand.png" alt />
             <p>阅读内容可点击放大</p>
         </div>
@@ -64,16 +64,19 @@ export default {
             nextArticleId: null,
             trainStatus: null,
             type: '',
-            description: ''
+            description: '',
+            tipShow: false
         }
     },
     created() {
+        // test begin
         // this.urlType = 'pdf'
         // this.url = 'https://gamiwechat.lillyadmin.cn/uploads/jardiance/01.pdf'
         // this.urlType = 'img'
         // this.url = 'https://www.hanboshi.com/ueditor/php/upload/image/20190902/1567413203130003.png'
         // this.urlType = 'mp4'
-        // this.url = 'http://df-emall.com/company.mp4'
+        // this.url = 'http://df-emall.com/media/company.mp4'
+        // test end
 
         this.$axios
             .all([this.startReadArticle(), this.getArticleByArticleId()])
@@ -86,6 +89,9 @@ export default {
                     this.trainStatus = articleList.data[0][0].trainStatus
                     this.description = articleList.data[0][0].description
                     this.urlHandler(articleList.data[0][0].pdf)
+                    // test begin
+                    // this.urlHandler(this.url)
+                    // test end
                     document.title = this.type
                 })
             )
@@ -127,6 +133,7 @@ export default {
         },
         urlHandler(src) {
             if (src.endsWith('pdf')) {
+                this.tipShow = true
                 this.urlType = 'pdf'
                 this.url = pdf.createLoadingTask({
                     url: src,
@@ -139,6 +146,8 @@ export default {
                         'width=device-width,user-scalable=yes'
                     )
             } else if (src.endsWith('png' || 'jpg' || 'jpeg' || 'gif')) {
+                this.tipShow = true
+                this.ableClick = true
                 this.urlType = 'img'
                 this.url = src
                 document
@@ -148,6 +157,8 @@ export default {
                         'width=device-width,user-scalable=yes'
                     )
             } else if (src.endsWith('mp4')) {
+                this.ableClick = true
+                this.tipShow = false
                 this.urlType = 'mp4'
                 this.url = src
             }
@@ -186,6 +197,7 @@ export default {
             if (val === 0 && this.currentPage > 1) {
                 this.currentPage--
             } else if (val === 1) {
+                console.log(this.currentPage, this.pageCount)
                 if (this.currentPage < this.pageCount) {
                     this.currentPage++
                 } else {

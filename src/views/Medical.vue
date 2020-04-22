@@ -142,6 +142,7 @@ export default {
                 .top {
                     display: grid;
                     grid-template-columns: 80% 20%;
+                    min-height: 18vw;
                     .time {
                         font-size: 5vw;
                         color: #4d433f;
@@ -165,8 +166,8 @@ export default {
                 }
                 .text {
                     font-size: 2.7vw;
-                    position: absolute;
-                    bottom: 2vw;
+                    position: relative;
+                    margin-top: 3vw;
                 }
                 &.fail {
                     border-color: #ffd502;
@@ -201,6 +202,7 @@ export default {
                 padding-left: 4.5vw;
                 padding-bottom: 0;
                 .top {
+                    min-height: initial;
                     > div {
                         &:nth-child(1) {
                             display: grid;
@@ -219,9 +221,7 @@ export default {
                     }
                 }
                 .text {
-                    margin-top: 3.5vw;
-                    position: relative;
-                    bottom: 1vw;
+                    bottom: 2vw;
                 }
             }
         }
